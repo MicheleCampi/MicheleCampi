@@ -1,5 +1,5 @@
 Michele Campi
-Operations Intelligence Engineer | Parma, Italy
+Production & Logistics Engineer | Parma, Italy
 
 I build solo, full-stack tools that turn complex operational problems into automated decisions — from database architecture to interactive dashboard.
 
