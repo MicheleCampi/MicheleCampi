@@ -11,8 +11,6 @@ Stack: Python 3.12 · FastAPI · OR-Tools · FastMCP · ScaleKit OAuth · Pydant
 optim-arc-v3 — x402/Nanopayments gateway on Arc
 A Next.js seller-side implementation of Circle Nanopayments for OptimEngine, exposing 10 paid optimization endpoints for autonomous AI agents. Forked from circlefin/arc-nanopayments (Apache-2.0).
 Live on Vercel: optim-arc-v3.vercel.app. Each endpoint returns HTTP 402 with valid x402 v2 + Circle GatewayWalletBatched payment requirements.
-PFE PRO — production planning app for mid-market manufacturers
-A browser-based React/Next.js scheduler for SME manufacturing operations: multi-commessa planning, changeover times, per-fase quantity overrides, archive system. Zero-install, configures in 30 minutes.
 
 📰 Recent articles
 Three production scheduling failures I've seen, and the math that would have caught them (April 2026)
