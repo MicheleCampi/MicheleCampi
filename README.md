@@ -13,6 +13,8 @@ A Next.js seller-side implementation of Circle Nanopayments for OptimEngine, exp
 Live on Vercel: optim-arc-v3.vercel.app. Each endpoint returns HTTP 402 with valid x402 v2 + Circle GatewayWalletBatched payment requirements.
 
 📰 Recent articles
+What an OR-Tools solver finds in a week of contract packaging — and what the planner usually misses (April 2026)
+A synthetic but realistic case study on a mid-market contract packager: eight customer orders, six production lines, sequence-dependent setup times. The expert manual schedule lands around 190 quarter-hours of makespan. OptimEngine returns the proven optimum in ten milliseconds: 161 quarters. The interesting finding isn't the 15% gain — it's what the solver shows about hidden capacity that the manual planner can't see.
 Three production scheduling failures I've seen, and the math that would have caught them (April 2026)
 Three chronic operational failures that repeat across European mid-market manufacturers, regardless of sector. Each had a visible symptom in the dashboards, a hidden cause nobody was tracking, a management reaction that addressed the symptom, and a quantitative method that would have caught the cause.
 Why your AI assistant can't actually plan your factory (April 2026)
