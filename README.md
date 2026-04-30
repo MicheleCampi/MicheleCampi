@@ -25,8 +25,8 @@ How I exposed OR-Tools as a production MCP server (April 2026)
 Building a Model Context Protocol server that wraps Google's OR-Tools constraint solver. Why MCP fits decision systems, what it took to make it production-grade, and what changes when AI agents can call your solver in natural language.
 
 🏭 Background
-7+ years in operations controlling within manufacturing, with a Finance and Risk Management degree (2013). I bridge deep domain expertise in production operations with self-taught technical capabilities in optimization, graph intelligence, and systems building.
-The path is uncommon — I built OptimEngine because I knew exactly what production controllers need and what manufacturing software typically gets wrong.
+9+ years building quantitative systems for industrial operations — cost models, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree (2013). In the last 2 years I extended that practice with modern computational infrastructure: production-grade constraint solvers, MCP server architecture, x402 payment APIs for autonomous AI agents.
+The path is uncommon — I built OptimEngine because nine years inside operations told me exactly what production controllers need, and what manufacturing software typically gets wrong.
 
 ⛓️ Active in agent economy
 ERC-8004 Agent #22518 on Base L2 — permanent on-chain identity for autonomous agent operations. OptimEngine endpoints are accessible via x402-native paid APIs on Arc testnet (Circle Nanopayments) and Base mainnet, designed as primitives for the emerging "markets of calculations and decisions" between AI agents.
