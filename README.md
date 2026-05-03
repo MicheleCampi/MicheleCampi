@@ -1,45 +1,63 @@
-Hi, I'm Michele 👋
-Operations Intelligence Engineer
-Manufacturing Optimization • OR-Tools • MCP Servers
-I build computational decision systems that optimize production, quantify risk, and prescribe actions for European mid-market manufacturers.
+# Hi, I'm Michele 👋
 
-🧠 Featured work
-OptimEngine — 11-tool mathematical optimization service
-A production solver for FJSP scheduling, CVRPTW routing, bin packing, Pareto multi-objective analysis, Monte Carlo risk simulation with CVaR metrics, parametric sensitivity, and prescriptive intelligence.
-Built on Google OR-Tools CP-SAT v9.0.0, exposed via REST API and dual-stack MCP (open SSE at /mcp, OAuth 2.1-gated Streamable HTTP at /mcp/v2). Live and verified on automotive manufacturing scenarios — optimal schedules in 0.04–2 seconds.
-Stack: Python 3.12 · FastAPI · OR-Tools · FastMCP · ScaleKit OAuth · Pydantic · Railway
-optim-arc-v3 — x402/Nanopayments gateway on Arc
-A Next.js seller-side implementation of Circle Nanopayments for OptimEngine, exposing 10 paid optimization endpoints for autonomous AI agents. Forked from circlefin/arc-nanopayments (Apache-2.0).
-Live on Vercel: optim-arc-v3.vercel.app. Each endpoint returns HTTP 402 with valid x402 v2 + Circle GatewayWalletBatched payment requirements.
+**Backend Engineer + 9 yrs operations domain.** Building [OptimEngine](https://optim-engine-production.up.railway.app) — production OR-Tools optimization service running on Python, FastAPI, and dual-stack MCP. Live, observable, and verifiable.
 
-📰 Recent articles
-What an OR-Tools solver finds in a week of contract packaging — and what the planner usually misses (April 2026)
-A synthetic but realistic case study on a mid-market contract packager: eight customer orders, six production lines, sequence-dependent setup times. The expert manual schedule lands around 190 quarter-hours of makespan. OptimEngine returns the proven optimum in ten milliseconds: 161 quarters. The interesting finding isn't the 15% gain — it's what the solver shows about hidden capacity that the manual planner can't see.
-Three production scheduling failures I've seen, and the math that would have caught them (April 2026)
-Three chronic operational failures that repeat across European mid-market manufacturers, regardless of sector. Each had a visible symptom in the dashboards, a hidden cause nobody was tracking, a management reaction that addressed the symptom, and a quantitative method that would have caught the cause.
-Why your AI assistant can't actually plan your factory (April 2026)
-A real test on a synthetic SME manufacturer — 15 CNC machines, 6 automotive orders. Compares OptimEngine's production solver to a generic AI assistant running CP-SAT in its sandbox. The gap is sharper than you'd expect.
-Exposing a math solver as Circle Nanopayments (April 2026)
-Forking Circle's arc-nanopayments sample to expose 10 optimization endpoints as gasless USDC paid resources on Arc testnet. Pattern, code, deploy, and the lessons learned along the way.
-How I exposed OR-Tools as a production MCP server (April 2026)
-Building a Model Context Protocol server that wraps Google's OR-Tools constraint solver. Why MCP fits decision systems, what it took to make it production-grade, and what changes when AI agents can call your solver in natural language.
+🌐 **Live API** · [optim-engine-production.up.railway.app](https://optim-engine-production.up.railway.app)
+📊 **Public dashboard** · [optimengine.grafana.net](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) — solver invocations, status mix, p95 latency (no login required)
+✍️ **Technical writing** · [michelecampi.github.io](https://michelecampi.github.io)
 
-🏭 Background
-9+ years building quantitative systems for industrial operations — cost models, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree (2013). In the last 2 years I extended that practice with modern computational infrastructure: production-grade constraint solvers, MCP server architecture, x402 payment APIs for autonomous AI agents.
-The path is uncommon — I built OptimEngine because nine years inside operations told me exactly what production controllers need, and what manufacturing software typically gets wrong.
+---
 
-⛓️ Active in agent economy
-ERC-8004 Agent #22518 on Base L2 — permanent on-chain identity for autonomous agent operations. OptimEngine endpoints are accessible via x402-native paid APIs on Arc testnet (Circle Nanopayments) and Base mainnet, designed as primitives for the emerging "markets of calculations and decisions" between AI agents.
+## Featured work
 
-📫 Open to
-I help European mid-market companies — particularly manufacturers and SMEs in the €5-50M revenue range — make sense of operations digitalization. The specific shapes this takes:
+### OptimEngine — production-grade mathematical optimization service
 
-Operational audit + quantitative analysis — focused assessment of a scheduling, planning, or capacity utilization problem, ending in a written report with findings, modeled alternatives, and ROI estimates
-Working prototypes and proofs of concept — building a functioning prototype that demonstrates whether an idea is viable, before committing to a full project
-Technical roadmap and architecture review — written documents that help business teams evaluate projects, with proposed architecture, step-by-step roadmap, cost and effort estimates
-Bridge work between business and technical teams — ongoing presence in projects where the business knowledge sits with operations or controlling but the technical execution sits with internal IT or external consultants
+A 9-solver service exposing flexible job-shop scheduling (FJSP), vehicle routing with time windows (CVRPTW), bin packing, sensitivity analysis, robust optimization, Monte Carlo with CVaR risk metrics, Pareto multi-objective frontier, and prescriptive intelligence. Two interfaces: standard REST API + dual-stack MCP (open SSE at `/mcp`, OAuth 2.1-gated Streamable HTTP at `/mcp/v2`).
 
-European mid-market focus (Italy, Germany, DACH primarily) — open to remote engagements globally.
-If your operations plan weekly production with spreadsheets and intuition, or you're integrating optimization decisions into AI agent pipelines, reach out.
+**Stack** · Python 3.12 · FastAPI · OR-Tools CP-SAT v9.0.0 · FastMCP · ScaleKit OAuth · Pydantic · Prometheus + Grafana · Railway
 
-Iterating OptimEngine in public. Follow this profile for new articles, integrations, and case studies.
+**Performance on realistic mid-market scenarios** · provably optimal schedules in 10–40 ms · stochastic CVaR (100 Monte Carlo scenarios) in ~2 s · sensitivity analysis (12 params × 5 perturbations) in <500 ms.
+
+**Documentation repo** · [optim-engine-showcase](https://github.com/MicheleCampi/optim-engine-showcase) (architecture, 11-tool reference, design decisions)
+
+### optim-arc-v3 — x402 payment gateway for autonomous AI agents
+
+Next.js gateway implementing Circle Nanopayments / x402 v2 protocol, exposing 10 paid OptimEngine endpoints. Forked from `circlefin/arc-nanopayments`, deployed on Vercel, returns HTTP 402 with valid `GatewayWalletBatched` payment requirements.
+
+[optim-arc-v3.vercel.app](https://optim-arc-v3.vercel.app)
+
+---
+
+## Currently building
+
+- **Observability stack hardening** · Prometheus metrics, Grafana dashboard, alert rules on Railway production. Public dashboard now live (linked above). Currently working on automated load test runs to keep dashboard always populated.
+- **OptimEngine v9.x extensions** · sequence-dependent setup times, per-machine duration scaling, availability windows, quality gates.
+- **Public technical articles** · 5 published, 2 in draft for May 2026 (risk-premium framework, observability for OR-Tools services).
+
+---
+
+## Recent technical writing
+
+- **[How fragile is your weekly plan? A risk-premium framework](https://michelecampi.github.io/2026/05/04/risk-premium-mid-market-manufacturing.html)** (May 2026) · Monte Carlo + CVaR applied to a real OR-Tools schedule. Doubling input volatility raises the risk premium from 4.2% to 7.2% — the plan is structurally robust, and the framework is reproducible via a single API call.
+- **[What an OR-Tools solver finds in a week of contract packaging](https://michelecampi.github.io/2026/04/29/or-tools-week-contract-packaging.html)** (April 2026) · Synthetic but realistic mid-market case: 8 customer orders, 6 production lines, sequence-dependent setup times. Manual schedule lands at 190 quarter-hours. OptimEngine returns the proven optimum in 10 ms: 161 quarters.
+- **[Why your AI assistant can't actually plan your factory](https://michelecampi.github.io/2026/04/25/why-ai-assistants-cant-plan-your-factory.html)** (April 2026) · Direct test comparing a frontier AI assistant running CP-SAT in its sandbox against a production constraint solver. Same problem, sharply different outcomes.
+- **[Three production scheduling failures, and the math that would have caught them](https://michelecampi.github.io/2026/04/26/three-scheduling-failures-and-the-math-that-would-have-caught-them.html)** (April 2026) · Three operational patterns recurring across mid-market plants, each with hidden cause and quantitative method.
+- **[How I exposed OR-Tools as a production MCP server](https://michelecampi.github.io/2026/04/15/how-i-exposed-or-tools-as-mcp.html)** (April 2026) · Building a Model Context Protocol server that wraps Google's constraint solver. What changes when AI agents can call your solver in natural language.
+
+Full archive on [the blog](https://michelecampi.github.io/).
+
+---
+
+## Background
+
+9+ years building quantitative systems for industrial operations — cost-by-workcenter modeling, margin frameworks, capacity analysis, and forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
+
+In the last 2 years extended that practice into computational infrastructure: production-grade constraint solvers, observability stacks, MCP server architecture, x402 payment APIs. The path is uncommon — domain depth from 9 years inside operations is what makes the optimization work credible, and the technical execution is what makes it useful.
+
+---
+
+## Reach out
+
+📧 **michele.campi [at] outlook.com** *(replace [at] with @)*
+
+Also on [X](https://x.com/MicheleC54474) and [Wellfound](https://wellfound.com/u/michele-campi) for engineering opportunities.
