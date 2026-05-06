@@ -30,6 +30,7 @@ Next.js gateway implementing Circle Nanopayments / x402 v2 protocol, exposing 10
 
 ## Currently building
 
+- **Edge proxy for browser-based MCP access** · [optim-engine-proxy](https://github.com/MicheleCampi/optim-engine-proxy) — thin Vercel Edge proxy (TypeScript, ~200 LOC) sitting in front of OptimEngine's MCP server. Decouples browser-side concerns (CORS, demo embeds, sandbox iframes) from the production solver, which stays server-to-server only. Architectural decision documented in DESIGN.md *before* implementation; verified end-to-end with curl + integration tests. Live: [optim-engine-proxy.vercel.app](https://optim-engine-proxy.vercel.app)
 - **Observability stack hardening** · Prometheus metrics, Grafana dashboard, alert rules on Railway production. Public dashboard now live (linked above). Currently working on automated load test runs to keep dashboard always populated.
 - **OptimEngine v9.x extensions** · sequence-dependent setup times, per-machine duration scaling, availability windows, quality gates.
 - **Public technical articles** · 5 published, 2 in draft for May 2026 (risk-premium framework, observability for OR-Tools services).
