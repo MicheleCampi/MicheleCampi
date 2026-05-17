@@ -46,7 +46,7 @@ Live, public, verifiable — the dashboard, the benchmarks, the test suite, and 
 
 ## Recent technical writing
 
-[**Why your OpenTelemetry trace shows nothing useful when the CPU is doing all the work — a CP-SAT case study**](https://michelecampi.github.io/observability/systems-engineering/2026/05/17/otel-tracing-compute-bound-services.html)
+__[Why your OpenTelemetry trace shows nothing useful when the CPU is doing all the work — a CP-SAT case study](https://michelecampi.github.io/observability/systems-engineering/2026/05/17/otel-tracing-compute-bound-services.html)__ (May 2026) · Why default OpenTelemetry auto-instrumentation fails for compute-bound services (solvers, ML inference, simulation engines). Before/after traces on a real CP-SAT workload showing how manual span instrumentation surfaces what auto-instrumentation hides.
 
 [**Why your AI assistant can't actually plan your factory**](https://michelecampi.github.io/) (April 2026) · A direct comparison between a frontier AI assistant running CP-SAT in its sandbox and a production constraint solver. Same problem, sharply different outcomes. Where general-purpose models meet the wall of dedicated solver engineering.
 
