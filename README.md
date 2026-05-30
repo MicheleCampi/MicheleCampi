@@ -1,4 +1,3 @@
-cat > ~/github-profile-readme.md << 'README_EOF'
 Hi, I'm Michele 👋
 Rust + AI infrastructure. I build observability for LLM systems and production-grade optimization services. Nine years inside industrial operations before turning that domain depth into code.
 
@@ -83,5 +82,4 @@ Full archive on the blog.
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modeling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
 
 In the last two years I extended that practice into computational infrastructure: production-grade constraint solvers, observability stacks, MCP server architecture, OAuth-protected APIs, and two Rust profilers for LLM inference — one sampling the process from above (/proc + NVML, validated across Ada, Hopper, and Ampere, multi-device topologies, and both llama.cpp and vLLM), one tracing the kernel and driver from below (eBPF, syscalls + libcuda). The path is uncommon — domain depth from nine years inside operations is what makes the optimization work credible, and the technical execution is what makes it useful in production.
-README_EOF
-echo "README completo pronto: $(wc -l < ~/github-profile-readme.md) righe, $(wc -c < ~/github-profile-readme.md) bytes"
+
