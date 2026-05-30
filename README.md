@@ -1,7 +1,7 @@
 Hi, I'm Michele 👋
 Rust + AI infrastructure. I build observability for LLM systems and production-grade optimization services. Nine years inside industrial operations before turning that domain depth into code.
 
-🌐 inferscope on GitHub · 📊 OptimEngine live dashboard · ✍️ Technical writing
+🌐 [inferscope on GitHub](https://github.com/MicheleCampi/inferscope) · 📊 [OptimEngine live dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) · ✍️ [Technical writing](https://michelecampi.github.io)
 
 ## Featured work
 
