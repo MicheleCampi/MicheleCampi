@@ -29,6 +29,16 @@ A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary, 
 
 **Hygiene** · pre-push CI gate (`cargo fmt --all --check` and `RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets`) · README documents all four study phases with per-phase findings tables · datasets reproducible via the included analysis script · Apache-2.0
 
+### vllm-coldstart-operator — Kubernetes operator for cold-start-aware vLLM
+
+A Rust operator (kube-rs) that manages vLLM inference replicas and treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that is the wrong moment — the process is alive but still loading weights and warming the GPU. The operator models that gap: a `VllmService` reaches `Ready` only when it is warm and able to serve, not merely running. It is the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in cluster.
+
+**What it does** · `VllmService` CRD (`model`, `replicas`, `warmupStrategy`: Eager/Graph) · reconcile loop that server-side-applies an owned Deployment with an owner reference (automatic garbage collection on delete) · maps `warmupStrategy` to pod config, the operational lever behind the probe's Phase D finding that CUDA graphs make cold start ~3× slower · derives a `Pending → Warming → Ready` phase from real Deployment readiness, written to the status subresource (no reconcile loop)
+
+**Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34 API) · tokio · server-side apply · status subresource
+
+**Hygiene** · unit tests on the lifecycle logic · CI with two jobs: fmt + clippy (`-D warnings`) + test + build, and an end-to-end job that spins up an ephemeral kind cluster and asserts the full lifecycle (Deployment created, status reaches Ready, owner reference set, garbage-collected on delete) with bounded polling, not fixed sleeps · two ADRs (why Rust/kube-rs over Go; cold start as a first-class state) · RUNBOOK · honest about scope: the control plane is real and tested, the data plane is a documented placeholder until GPU integration · Apache-2.0
+
 ### OptimEngine — production OR-Tools optimization service
 
 A 4-layer system exposing 11 MCP tools across 4 intelligence levels (9 optimization + 2 utility): flexible job-shop scheduling (FJSP), vehicle routing with time windows (CVRPTW), bin packing, sensitivity analysis, robust optimization, Monte Carlo with CVaR risk metrics, Pareto multi-objective frontier, prescriptive intelligence. Two interfaces: standard REST API and dual-stack MCP (open SSE at /mcp, OAuth 2.1-gated Streamable HTTP at /mcp/v2).
