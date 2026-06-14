@@ -19,15 +19,6 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Hygiene** · MSRV pinned via rust-toolchain.toml · nine Architecture Decision Records · SECURITY.md with explicit threat model · RUNBOOK.md with failure scenarios from real validation runs (Detection → Diagnosis → Fix) · pre-push hook enforcing fmt + clippy `-D warnings` · Apache-2.0
 
-### Dynamo KV-router under saturation — a performance investigation
-An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100, across a scaling curve (N=2/4/8 workers) with a real production trace (Mooncake). The documentation presents the KV-router as faster; I wanted to measure how the benefit behaves as you add capacity. It inverts. Under saturation (N=2) the KV-router isn't "faster" — it sheds ~14% of requests with HTTP 503 to keep latency low for the rest, while round-robin admits everything and lets latency collapse to ~39s. It's a latency-vs-completeness trade-off, not a win, and it vanishes once you're no longer capacity-bound (N=4/8: zero failures either arm, no KV benefit). I traced the mechanism to the Dynamo source at the exact release tag (v1.2.0) — a worker-load monitor created only in KV mode, gated entirely on `--router-mode`.
-
-**What it demonstrates** · reading and reasoning about a large unfamiliar Rust codebase · distributed-systems behaviour under load (load-shedding vs queueing) · triangulating a claim across client metrics (AIPerf), server-side per-device telemetry (inferscope), and source code · rejecting three wrong explanations before landing on the one the data supports
-
-**Stack** · NVIDIA Dynamo 1.2.0 · vLLM runtime · Qwen3-8B · AIPerf fixed-schedule replay · inferscope `--sample-only` for server-side GPU telemetry · 8×A100-SXM4-40GB
-
-[Repository with raw results, analysis scripts, and the full evidence chain →](https://github.com/MicheleCampi/dynamo-kv-router-ab) · *write-up upcoming (June 2026)*
-
 ### vllm-coldstart-probe — eBPF profiler for vLLM cold start
 A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary — the layer where process-level profilers stop. It attaches syscall tracepoints (openat, read, mmap, close) and uprobes on the libcuda C API (cuInit, cuModuleLoadData, cuMemAlloc, cuLaunchKernel), correlating both families on one timeline to answer where the seconds between "process start" and "first token" actually go. Complements inferscope: that profiler looks down from the process, this one looks up from the kernel — cold start is split across exactly the seam where most tools stop.
 
@@ -52,6 +43,15 @@ The capstone that ties the inference work together: a reproducible Terraform-pro
 **Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
 
 *Repository public at article go-live (Aug 2026); engineering post-mortem written.*
+
+### Dynamo KV-router under saturation — a performance investigation
+An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100, across a scaling curve (N=2/4/8 workers) with a real production trace (Mooncake). The documentation presents the KV-router as faster; I wanted to measure how the benefit behaves as you add capacity. It inverts. Under saturation (N=2) the KV-router isn't "faster" — it sheds ~14% of requests with HTTP 503 to keep latency low for the rest, while round-robin admits everything and lets latency collapse to ~39s. It's a latency-vs-completeness trade-off, not a win, and it vanishes once you're no longer capacity-bound (N=4/8: zero failures either arm, no KV benefit). I traced the mechanism to the Dynamo source at the exact release tag (v1.2.0) — a worker-load monitor created only in KV mode, gated entirely on `--router-mode`.
+
+**What it demonstrates** · reading and reasoning about a large unfamiliar Rust codebase · distributed-systems behaviour under load (load-shedding vs queueing) · triangulating a claim across client metrics (AIPerf), server-side per-device telemetry (inferscope), and source code · rejecting three wrong explanations before landing on the one the data supports
+
+**Stack** · NVIDIA Dynamo 1.2.0 · vLLM runtime · Qwen3-8B · AIPerf fixed-schedule replay · inferscope `--sample-only` for server-side GPU telemetry · 8×A100-SXM4-40GB
+
+[Repository with raw results, analysis scripts, and the full evidence chain →](https://github.com/MicheleCampi/dynamo-kv-router-ab) · *write-up upcoming (June 2026)*
 
 ### OptimEngine — production OR-Tools optimisation service
 A production constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: it's a real service that has run in production with full observability, not a demo — the engineering discipline transfers regardless of domain.
