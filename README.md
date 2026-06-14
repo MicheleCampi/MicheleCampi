@@ -13,7 +13,7 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Stack** · Rust 1.83 · tokio multi-thread runtime · reqwest + SSE streaming · async /proc + NVML sampler with process-tree aggregation · five-crate Cargo workspace with strict separation of concerns (is-core pure types, is-probe network I/O, is-sysmon filesystem + GPU I/O, is-report presentation, inferscope CLI orchestrator)
 
-**Validation** · 122 tests · CI gated on `-D warnings` · validated end-to-end across Ada (L4), Hopper (H100 SXM), and Ampere (4×A40) on Qwen 2.5 from 0.5B to 32B, against both llama.cpp and vLLM 0.21 · per-device GPU metrics expose the asymmetry that cluster-aggregate readings hide on a TP=2 run (two busy GPUs at ~150 W, two idle at 33 W) — ADR-007 · `--sample-only` mode attaches to a running engine without driving load, the capability behind the Dynamo experiment below — ADR-009 · OTLP/HTTP export via OpenTelemetry 0.32 — ADR-008
+**Validation** · 122 tests · CI gated on `-D warnings` · validated end-to-end across Ada (L4), Hopper (H100 SXM), and Ampere (4×A40) on Qwen 2.5 from 0.5B to 32B, against both llama.cpp and vLLM · per-device GPU metrics expose the asymmetry that cluster-aggregate readings hide on a TP=2 run (two busy GPUs at ~150 W, two idle at 33 W) — ADR-007 · `--sample-only` mode attaches to a running engine without driving load, the capability behind the Dynamo experiment below — ADR-009 · OTLP/HTTP export via OpenTelemetry 0.32 — ADR-008
 
 **Deployment** · multi-stage Dockerfile (rust:1.83-slim → nvidia/cuda runtime, non-root, ~1.65 GB) · public image at `ghcr.io/michelecampi/inferscope` semver-pinned, auto-published by GitHub Action on every `v*` tag · example `deploy/` manifests for docker-compose and a Kubernetes Job
 
@@ -38,9 +38,20 @@ A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary �
 ### vllm-coldstart-operator — Kubernetes operator for cold-start-aware vLLM
 A Rust operator (kube-rs) that treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that's the wrong moment — the process is alive but still loading weights and warming the GPU. A VllmService reaches Ready only when it is warm and able to serve. It's the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in-cluster.
 
-**What it does** · VllmService CRD (model, replicas, warmupStrategy: Eager/Graph) · reconcile loop that server-side-applies an owned Deployment with garbage collection · maps warmupStrategy to the probe's Phase D finding about CUDA graphs · derives Pending → Warming → Ready from real Deployment readiness, written to the status subresource
+**What it does** · VllmService CRD (model, replicas, warmupStrategy: Eager/Graph, runtimeClassName, extraArgs for engine tuning) · reconcile loop that server-side-applies an owned Deployment with garbage collection · maps warmupStrategy to the probe's Phase D finding about CUDA graphs · derives Pending → Warming → Ready from real Deployment readiness, written to the status subresource and exported as the `vcso_vllmservice_phase` metric
 
-**Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34) · server-side apply · status subresource · CI with an end-to-end job on an ephemeral kind cluster (asserts the full lifecycle, owner reference, garbage collection) · honest about scope: control plane real and tested, data plane a documented placeholder until GPU integration · Apache-2.0
+**Proven on real GPUs** · validated end-to-end serving Qwen2.5-7B on an NVIDIA L4: the control plane reconciles, the autoscaler brings up the GPU node, vLLM loads and warms, and the VllmService transitions Pending → Warming → Ready while the phase metric streams to Grafana. Getting there meant fixing the assumptions a kind/K3s-only operator carries into a managed cluster — RuntimeClass (GKE uses the device plugin with the default runtime, not an `nvidia` RuntimeClass), the vLLM serving invocation (`vllm serve` args, not env vars), and `LD_LIBRARY_PATH` for the GKE driver mount that the CUDA-12.8+ base image no longer finds.
+
+**Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34) · server-side apply · status subresource · CI with an end-to-end job on an ephemeral kind cluster (asserts the full lifecycle, owner reference, garbage collection) · public OpenMetrics endpoint · two-tag GHCR release pipeline · Apache-2.0
+
+### GKE LLM inference platform — IaC → GitOps → inference, end to end
+The capstone that ties the inference work together: a reproducible Terraform-provisioned GKE cluster (regional, Workload Identity, shielded nodes, scale-to-zero GPU node pool) running an ArgoCD app-of-apps that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity), and a Grafana Alloy → Mimir observability pipeline — then drives a real vLLM workload on the GPU through it. One `terraform apply` to a served, warm, observable model; one `terraform destroy` back to zero. The phase timeline of a real cold start lands on a Grafana dashboard as the signature artifact.
+
+**What it demonstrates** · platform engineering across the whole path: infrastructure as code, GitOps reconciliation, secret management without secrets in git, in-cluster observability, and GPU workload lifecycle — plus the debugging that only surfaces on real managed GPUs (admission, invocation, dynamic linker), captured as a written post-mortem
+
+**Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
+
+*Repository public at article go-live (Aug 2026); engineering post-mortem written.*
 
 ### OptimEngine — production OR-Tools optimisation service
 A production constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: it's a real service that has run in production with full observability, not a demo — the engineering discipline transfers regardless of domain.
@@ -74,8 +85,9 @@ Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github
 **Upcoming**
 - *NVIDIA's KV-router isn't faster — under load it drops requests, and that's the design* — the Dynamo scaling-curve experiment above, write-up in progress (June 2026)
 - A two-part cold-start series built on vllm-coldstart-probe: where vLLM cold start actually spends its time, and what quantization and CUDA graphs cost at startup
+- *From terraform apply to a warm model* — the GKE inference platform capstone: IaC → GitOps → a served vLLM model, and the managed-GPU debugging it took (Aug 2026)
 
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
 
-In the last two years I extended that into computational infrastructure: production constraint solvers, observability stacks, and two Rust profilers for LLM inference — one sampling the process from above (/proc + NVML, validated across Ada, Hopper, and Ampere, both llama.cpp and vLLM), one tracing the kernel and driver from below (eBPF, syscalls + libcuda). The domain depth is what makes the systems work grounded; the technical execution is what makes it useful in production.
+In the last two years I extended that into computational infrastructure: production constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs. The domain depth is what makes the systems work grounded; the technical execution is what makes it useful in production.
