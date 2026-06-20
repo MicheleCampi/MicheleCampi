@@ -22,9 +22,19 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 ### vllm-coldstart-probe — eBPF profiler for vLLM cold start
 A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary — the layer where process-level profilers stop. It attaches syscall tracepoints (openat, read, mmap, close) and uprobes on the libcuda C API (cuInit, cuModuleLoadData, cuMemAlloc, cuLaunchKernel), correlating both families on one timeline to answer where the seconds between "process start" and "first token" actually go. Complements inferscope: that profiler looks down from the process, this one looks up from the kernel — cold start is split across exactly the seam where most tools stop.
 
-**Findings** · a four-phase study on Lambda A10/A100 under vLLM 0.22, every number from a capture. Kernel I/O is only ~7% of an ~18s cold start — the dominant cost is GPU warmup and synchronisation, not the disk. Parameters grow 4.6× but load time only 1.5× (sub-linear). Quantization multiplies warmup kernels (AWQ 4.1×, GPTQ 2.4× the cuLaunchKernel count of FP16). Enabling CUDA graphs makes cold start 3.2× slower and issues 79× the kernels — a real trade-off against steady-state speedup for scale-to-zero.
+**Findings** · a four-phase study on Lambda A10/A100 under vLLM 0.22, every number from a capture. Kernel I/O is only ~7% of an ~18s cold start — the dominant cost is GPU warmup and synchronisation, not the disk. Parameters grow 4.6× but load time only 1.5× (sub-linear). Quantization multiplies warmup kernels (AWQ 4.1×, GPTQ 2.4× the cuLaunchKernel count of FP16). Enabling CUDA graphs makes cold start 3.2× slower and issues 79× the kernels — a real trade-off against steady-state speedup, which I went on to measure directly (see *CUDA graphs trade-off* below).
 
 **Stack** · Rust · aya 0.13 eBPF · no_std kernel-side crate · static musl userspace binary · three-crate workspace · Apache-2.0
+
+### CUDA graphs trade-off — when graphs stop paying off
+
+A 40-run controlled experiment isolating one vLLM flag — `enforce_eager` — across two model sizes (Qwen2.5-7B, 32B) and two load regimes, on an H100. The probe above flagged that CUDA graphs cost 3.2× at cold start; this measures what they pay back, and finds something the usual "just enable CUDA graphs" advice misses: the trade-off changes sign. Graphs speed up per-token decode in all eight cells measured (TPOT lower with graphs everywhere) — but on the 32B under sustained load, enabling them makes the *server* 5% slower end-to-end, completing identical work in more wall-clock. Faster kernel, slower server, same run. The cold-start penalty (+7.4s on 7B, +15.9s on 32B) gives a concrete break-even: ~2,550 requests on the 7B, never on the saturated 32B.
+
+**What it demonstrates** · isolating one variable cleanly and reading two measurement planes against one clock (inferscope for cold-start + per-device GPU, `vllm bench serve` for steady state) · killing the alternative explanations before believing the result — five-rep distributions separated (not noise), ITL ≈ TPOT (not preemption), identical tokens emitted (same work) · a two-factor causal model: the kernel-launch gain shrinks with model size, the captured-shape padding loss grows with queue overload, and their balance sets the sign · stating precisely what is measured versus what remains a hypothesis to validate by instrumenting the scheduler
+
+**Stack** · vLLM 0.23.0 · 1× H100 80GB · Qwen2.5-7B/32B bf16 · inferscope (per-device NVML) + vllm bench serve · idempotent Rust-disciplined Python orchestrator · reproducible: every number regenerable from the committed analysis script over 40 raw result files
+
+Repository public at article go-live (Jul–Aug 2026).
 
 ### vllm-coldstart-operator — Kubernetes operator for cold-start-aware vLLM
 A Rust operator (kube-rs) that treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that's the wrong moment — the process is alive but still loading weights and warming the GPU. A VllmService reaches Ready only when it is warm and able to serve. It's the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in-cluster.
@@ -84,7 +94,7 @@ Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github
 
 **Upcoming**
 - *NVIDIA's KV-router isn't faster — under load it drops requests, and that's the design* — the Dynamo scaling-curve experiment above, write-up in progress (June 2026)
-- A two-part cold-start series built on vllm-coldstart-probe: where vLLM cold start actually spends its time, and what quantization and CUDA graphs cost at startup
+- A cold-start series built on vllm-coldstart-probe: where vLLM cold start actually spends its time, the quantization cost — and the CUDA graphs trade-off, where measuring the full startup-vs-steady-state picture turned up a sign inversion between 7B and 32B that the kernel-level view alone couldn't predict
 - *From terraform apply to a warm model* — the GKE inference platform capstone: IaC → GitOps → a served vLLM model, and the managed-GPU debugging it took (Aug 2026)
 
 ## Background
