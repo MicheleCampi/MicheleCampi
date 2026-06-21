@@ -1,6 +1,6 @@
 Hi, I'm Michele 👋
 
-**Rust systems engineer.** Performance and observability for production systems — demonstrated deep on LLM inference. I trace behaviour to the source code and measure what really happens under load. Async-first, portfolio-driven.
+**Rust systems engineer.** LLM inference infrastructure: profiling, serving, and orchestration, proven on real GPUs. I trace behaviour to the source and measure what happens under load. Async-first, portfolio-driven.
 
 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · 📊 [OptimEngine live dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) · ✍️ [Technical writing](https://michelecampi.github.io)
 
@@ -13,7 +13,7 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Stack** · Rust 1.83 · tokio multi-thread runtime · reqwest + SSE streaming · async /proc + NVML sampler with process-tree aggregation · five-crate Cargo workspace with strict separation of concerns (is-core pure types, is-probe network I/O, is-sysmon filesystem + GPU I/O, is-report presentation, inferscope CLI orchestrator)
 
-**Validation** · 122 tests · CI gated on `-D warnings` · validated end-to-end across Ada (L4), Hopper (H100 SXM), and Ampere (4×A40) on Qwen 2.5 from 0.5B to 32B, against both llama.cpp and vLLM · per-device GPU metrics expose the asymmetry that cluster-aggregate readings hide on a TP=2 run (two busy GPUs at ~150 W, two idle at 33 W) — ADR-007 · `--sample-only` mode attaches to a running engine without driving load, the capability behind the Dynamo experiment below — ADR-009 · OTLP/HTTP export via OpenTelemetry 0.32 — ADR-008 · energy and efficiency from the NVML hardware energy counter — tokens-per-joule and tokens-per-watt, validated end-to-end on an A10 (Ampere) against a real llama.cpp workload — ADR-010
+**Validation** · 147 tests (140 default + GPU/energy gated behind `gpu-nvidia`) · CI gated on `-D warnings` · validated end-to-end across Ada (L4), Hopper (H100 SXM), and Ampere (4×A40) on Qwen 2.5 from 0.5B to 32B, against both llama.cpp and vLLM · per-device GPU metrics expose the asymmetry that cluster-aggregate readings hide on a TP=2 run (two busy GPUs at ~150 W, two idle at 33 W) — ADR-007 · `--sample-only` mode attaches to a running engine without driving load, the capability behind the Dynamo experiment below — ADR-009 · OTLP/HTTP export via OpenTelemetry 0.32 — ADR-008 · energy and efficiency from the NVML hardware energy counter — tokens-per-joule and tokens-per-watt, validated end-to-end on an A10 (Ampere) against a real llama.cpp workload — ADR-010
 
 **Deployment** · multi-stage Dockerfile (rust:1.83-slim → nvidia/cuda runtime, non-root, ~1.65 GB) · public image at `ghcr.io/michelecampi/inferscope` semver-pinned, auto-published by GitHub Action on every `v*` tag · example `deploy/` manifests for docker-compose and a Kubernetes Job
 
