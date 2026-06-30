@@ -1,12 +1,30 @@
 Hi, I'm Michele 👋
 
-**Rust systems engineer.** LLM inference infrastructure: profiling, serving, and orchestration, proven on real GPUs. I trace behaviour to the source and measure what happens under load. Async-first, portfolio-driven.
+**AI Infrastructure Engineer.** I design and build infrastructure end-to-end — Rust Kubernetes operators, IaC→GitOps platforms on GKE, observability — with depth in LLM inference (profiling, serving, energy). Proven end-to-end on real GPUs. I trace behaviour to the source and measure what really happens under load; my work is reproducible, documented (ADRs, runbooks), and validated, not demoed. AI-assisted and async-first.
 
 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · 📊 [OptimEngine live dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) · ✍️ [Technical writing](https://michelecampi.github.io)
 
 ---
 
 ## Featured work
+
+### GKE platform — IaC → GitOps, end to end (serving a real vLLM workload)
+The capstone that ties the inference work together: a reproducible Terraform-provisioned GKE cluster (regional, Workload Identity, shielded nodes, scale-to-zero GPU node pool) running an ArgoCD app-of-apps that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity), and a Grafana Alloy → Mimir observability pipeline — then drives a real vLLM workload on the GPU through it. One `terraform apply` to a served, warm, observable model; one `terraform destroy` back to zero. The phase timeline of a real cold start lands on a Grafana dashboard as the signature artifact.
+
+**What it demonstrates** · platform engineering across the whole path: infrastructure as code, GitOps reconciliation, secret management without secrets in git, in-cluster observability, and GPU workload lifecycle — plus the debugging that only surfaces on real managed GPUs (admission, invocation, dynamic linker), captured as a written post-mortem
+
+**Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
+
+*Repository public at article go-live (Aug 2026); engineering post-mortem written.*
+
+### vllm-coldstart-operator — Kubernetes operator for cold-start-aware vLLM
+A Rust operator (kube-rs) that treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that's the wrong moment — the process is alive but still loading weights and warming the GPU. A VllmService reaches Ready only when it is warm and able to serve. It's the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in-cluster.
+
+**What it does** · VllmService CRD (model, replicas, warmupStrategy: Eager/Graph, runtimeClassName, extraArgs for engine tuning) · reconcile loop that server-side-applies an owned Deployment with garbage collection · maps warmupStrategy to the probe's Phase D finding about CUDA graphs · derives Pending → Warming → Ready from real Deployment readiness, written to the status subresource and exported as the `vcso_vllmservice_phase` metric
+
+**Proven on real GPUs** · validated end-to-end serving Qwen2.5-7B on an NVIDIA L4: the control plane reconciles, the autoscaler brings up the GPU node, vLLM loads and warms, and the VllmService transitions Pending → Warming → Ready while the phase metric streams to Grafana. Getting there meant fixing the assumptions a kind/K3s-only operator carries into a managed cluster — RuntimeClass (GKE uses the device plugin with the default runtime, not an `nvidia` RuntimeClass), the vLLM serving invocation (`vllm serve` args, not env vars), and `LD_LIBRARY_PATH` for the GKE driver mount that the CUDA-12.8+ base image no longer finds.
+
+**Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34) · server-side apply · status subresource · CI with an end-to-end job on an ephemeral kind cluster (asserts the full lifecycle, owner reference, garbage collection) · public OpenMetrics endpoint · two-tag GHCR release pipeline · Apache-2.0
 
 ### inferscope — profiler and observability for LLM inference engines
 A Rust profiler that drives an OpenAI-compatible inference engine through its HTTP API, captures per-token timing end-to-end, and correlates that timing with the engine process's CPU and GPU resource usage on a single shared wall clock. The point is the correlation: client-side latency and server-side hardware behaviour are two different truths, and the gap between them is where most inference performance problems hide. Outputs a plain-text report for terminal reading and a JSON document carrying both raw signals and derived metrics (TTFT, tokens-per-second excluding TTFT, inter-token latency percentiles, RSS aggregations, VRAM and per-device SM utilisation for multi-GPU runs).
@@ -19,13 +37,6 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Hygiene** · MSRV pinned via rust-toolchain.toml · eleven Architecture Decision Records · SECURITY.md with explicit threat model · RUNBOOK.md with failure scenarios from real validation runs (Detection → Diagnosis → Fix) · pre-push hook enforcing fmt + clippy `-D warnings` · Apache-2.0
 
-### vllm-coldstart-probe — eBPF profiler for vLLM cold start
-A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary — the layer where process-level profilers stop. It attaches syscall tracepoints (openat, read, mmap, close) and uprobes on the libcuda C API (cuInit, cuModuleLoadData, cuMemAlloc, cuLaunchKernel), correlating both families on one timeline to answer where the seconds between "process start" and "first token" actually go. Complements inferscope: that profiler looks down from the process, this one looks up from the kernel — cold start is split across exactly the seam where most tools stop.
-
-**Findings** · a four-phase study on Lambda A10/A100 under vLLM 0.22, every number from a capture. Kernel I/O is only ~7% of an ~18s cold start — the dominant cost is GPU warmup and synchronisation, not the disk. Parameters grow 4.6× but load time only 1.5× (sub-linear). Quantization multiplies warmup kernels (AWQ 4.1×, GPTQ 2.4× the cuLaunchKernel count of FP16). Enabling CUDA graphs makes cold start 3.2× slower and issues 79× the kernels — a real trade-off against steady-state speedup, which I went on to measure directly (see *CUDA graphs trade-off* below).
-
-**Stack** · Rust · aya 0.13 eBPF · no_std kernel-side crate · static musl userspace binary · three-crate workspace · Apache-2.0
-
 ### CUDA graphs trade-off — when graphs stop paying off
 
 A 40-run controlled experiment isolating one vLLM flag — `enforce_eager` — across two model sizes (Qwen2.5-7B, 32B) and two load regimes, on an H100. The probe above flagged that CUDA graphs cost 3.2× at cold start; this measures what they pay back, and finds something the usual "just enable CUDA graphs" advice misses: the trade-off changes sign. Graphs speed up per-token decode in all eight cells measured (TPOT lower with graphs everywhere) — but on the 32B under sustained load, enabling them makes the *server* 5% slower end-to-end, completing identical work in more wall-clock. Faster kernel, slower server, same run. A separate NVML energy re-run on the same H100 confirms the inversion on a second, independent axis — the saturated 32B spends ~1.8% more joules per output token with graphs on, the energy counter and the throughput benchmark agreeing on one conclusion (per-phase prefill/decode attribution, ADR-012, validated here). The cold-start penalty (+7.4s on 7B, +15.9s on 32B) gives a concrete break-even: ~2,550 requests on the 7B, never on the saturated 32B.
@@ -36,23 +47,12 @@ A 40-run controlled experiment isolating one vLLM flag — `enforce_eager` — a
 
 Repository public at article go-live (Jul–Aug 2026).
 
-### vllm-coldstart-operator — Kubernetes operator for cold-start-aware vLLM
-A Rust operator (kube-rs) that treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that's the wrong moment — the process is alive but still loading weights and warming the GPU. A VllmService reaches Ready only when it is warm and able to serve. It's the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in-cluster.
+### vllm-coldstart-probe — eBPF profiler for vLLM cold start
+A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary — the layer where process-level profilers stop. It attaches syscall tracepoints (openat, read, mmap, close) and uprobes on the libcuda C API (cuInit, cuModuleLoadData, cuMemAlloc, cuLaunchKernel), correlating both families on one timeline to answer where the seconds between "process start" and "first token" actually go. Complements inferscope: that profiler looks down from the process, this one looks up from the kernel — cold start is split across exactly the seam where most tools stop.
 
-**What it does** · VllmService CRD (model, replicas, warmupStrategy: Eager/Graph, runtimeClassName, extraArgs for engine tuning) · reconcile loop that server-side-applies an owned Deployment with garbage collection · maps warmupStrategy to the probe's Phase D finding about CUDA graphs · derives Pending → Warming → Ready from real Deployment readiness, written to the status subresource and exported as the `vcso_vllmservice_phase` metric
+**Findings** · a four-phase study on Lambda A10/A100 under vLLM 0.22, every number from a capture. Kernel I/O is only ~7% of an ~18s cold start — the dominant cost is GPU warmup and synchronisation, not the disk. Parameters grow 4.6× but load time only 1.5× (sub-linear). Quantization multiplies warmup kernels (AWQ 4.1×, GPTQ 2.4× the cuLaunchKernel count of FP16). Enabling CUDA graphs makes cold start 3.2× slower and issues 79× the kernels — a real trade-off against steady-state speedup, which I went on to measure directly (see *CUDA graphs trade-off* below).
 
-**Proven on real GPUs** · validated end-to-end serving Qwen2.5-7B on an NVIDIA L4: the control plane reconciles, the autoscaler brings up the GPU node, vLLM loads and warms, and the VllmService transitions Pending → Warming → Ready while the phase metric streams to Grafana. Getting there meant fixing the assumptions a kind/K3s-only operator carries into a managed cluster — RuntimeClass (GKE uses the device plugin with the default runtime, not an `nvidia` RuntimeClass), the vLLM serving invocation (`vllm serve` args, not env vars), and `LD_LIBRARY_PATH` for the GKE driver mount that the CUDA-12.8+ base image no longer finds.
-
-**Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34) · server-side apply · status subresource · CI with an end-to-end job on an ephemeral kind cluster (asserts the full lifecycle, owner reference, garbage collection) · public OpenMetrics endpoint · two-tag GHCR release pipeline · Apache-2.0
-
-### GKE LLM inference platform — IaC → GitOps → inference, end to end
-The capstone that ties the inference work together: a reproducible Terraform-provisioned GKE cluster (regional, Workload Identity, shielded nodes, scale-to-zero GPU node pool) running an ArgoCD app-of-apps that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity), and a Grafana Alloy → Mimir observability pipeline — then drives a real vLLM workload on the GPU through it. One `terraform apply` to a served, warm, observable model; one `terraform destroy` back to zero. The phase timeline of a real cold start lands on a Grafana dashboard as the signature artifact.
-
-**What it demonstrates** · platform engineering across the whole path: infrastructure as code, GitOps reconciliation, secret management without secrets in git, in-cluster observability, and GPU workload lifecycle — plus the debugging that only surfaces on real managed GPUs (admission, invocation, dynamic linker), captured as a written post-mortem
-
-**Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
-
-*Repository public at article go-live (Aug 2026); engineering post-mortem written.*
+**Stack** · Rust · aya 0.13 eBPF · no_std kernel-side crate · static musl userspace binary · three-crate workspace · Apache-2.0
 
 ### Dynamo KV-router under saturation — a performance investigation
 An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100, across a scaling curve (N=2/4/8 workers) with a real production trace (Mooncake). The documentation presents the KV-router as faster; I wanted to measure how the benefit behaves as you add capacity. It inverts. Under saturation (N=2) the KV-router isn't "faster" — it sheds ~14% of requests with HTTP 503 to keep latency low for the rest, while round-robin admits everything and lets latency collapse to ~39s. It's a latency-vs-completeness trade-off, not a win, and it vanishes once you're no longer capacity-bound (N=4/8: zero failures either arm, no KV benefit). I traced the mechanism to the Dynamo source at the exact release tag (v1.2.0) — a worker-load monitor created only in KV mode, gated entirely on `--router-mode`.
