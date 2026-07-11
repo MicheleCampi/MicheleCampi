@@ -39,6 +39,16 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Hygiene** · MSRV pinned via rust-toolchain.toml · eleven Architecture Decision Records · SECURITY.md with explicit threat model · RUNBOOK.md with failure scenarios from real validation runs (Detection → Diagnosis → Fix) · pre-push hook enforcing fmt + clippy `-D warnings` · Apache-2.0
 
+### Energy signature of KV-cache reuse in agentic workloads — +69% tokens/joule
+
+An 18-run controlled experiment measuring how KV-cache hit rate changes the energy cost of agentic (ReAct-style) inference — Qwen2.5-32B on a single H100 SXM5, vLLM. Three regimes sweep prefix reuse from cold prompts (H0) to heavy shared-prefix reuse (H2): tokens/joule rises monotonically 5.69 → 6.92 → 9.63 — **+69.2% at H2 vs H0** (window-based), std < 3% everywhere, and the gradient survives intact under an injected-failure condition. The figure is a conservative bound: the fixed measurement window's idle tail is longest exactly where efficiency is highest, so exact active-window attribution would widen the gradient, not shrink it. The workload is prefill-dominated by design — constant short generation, the shape of agentic loops with long shared context and short tool-call outputs — so the gradient is a prefill/KV-reuse effect.
+
+**What it demonstrates** · KV-cache hit-rate and hardware energy read on one shared clock (inferscope ADR-011 Prometheus scrape + NVML energy counter, ADR-012 per-phase attribution) · a measurement campaign run to a pre-committed acceptance matrix — 18/18 cells, zero aborts, zero exclusions, anomalies kept and documented · process discipline: mandatory node-off dress rehearsal against a fake engine before every GPU session, established after a hardening cycle that caught a silently-null energy path in the instrumentation itself
+
+**Stack** · vLLM · Qwen2.5-32B bf16 · 1× H100 80GB SXM5 · inferscope (KV scrape + NVML energy) · every number regenerable from committed analysis scripts
+
+*Repository public at article go-live (Aug 2026).*
+
 ### CUDA graphs trade-off — when graphs stop paying off
 
 A 40-run controlled experiment isolating one vLLM flag — `enforce_eager` — across two model sizes (Qwen2.5-7B, 32B) and two load regimes, on an H100. The probe above flagged that CUDA graphs cost 3.2× at cold start; this measures what they pay back, and finds something the usual "just enable CUDA graphs" advice misses: the trade-off changes sign. Graphs speed up per-token decode in all eight cells measured (TPOT lower with graphs everywhere) — but on the 32B under sustained load, enabling them makes the *server* 5% slower end-to-end, completing identical work in more wall-clock. Faster kernel, slower server, same run. A separate NVML energy re-run on the same H100 confirms the inversion on a second, independent axis — the saturated 32B spends ~1.8% more joules per output token with graphs on, the energy counter and the throughput benchmark agreeing on one conclusion (per-phase prefill/decode attribution, ADR-012, validated here). The cold-start penalty (+7.4s on 7B, +15.9s on 32B) gives a concrete break-even: ~2,550 requests on the 7B, never on the saturated 32B.
@@ -97,6 +107,7 @@ Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github
 **Upcoming**
 - A cold-start series built on vllm-coldstart-probe: where vLLM cold start actually spends its time, the quantization cost — and the CUDA graphs trade-off, where measuring the full startup-vs-steady-state picture turned up a sign inversion between 7B and 32B that the kernel-level view alone couldn't predict
 - *From terraform apply to a warm model* — the GKE inference platform capstone: IaC → GitOps → a served vLLM model, and the managed-GPU debugging it took (Aug 2026)
+- *The energy signature of KV-cache reuse* — +69% tokens/joule across hit-rate regimes in agentic workloads, and why the number is a conservative bound (Aug 2026)
 
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
