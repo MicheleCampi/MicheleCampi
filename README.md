@@ -17,6 +17,13 @@ The capstone that ties the inference work together: a reproducible Terraform-pro
 
 *Repository public at article go-live (Aug 2026); engineering post-mortem written.*
 
+### EKS twin — the same GitOps contract on AWS (public now)
+The AWS counterpart of the GKE capstone, built and E2E-validated in a single session: Terraform-provisioned EKS 1.36 (S3 state backend with native lockfile, access entries in API mode), ArgoCD app-of-apps, and the cold-start operator deployed via GitOps — three CRDs served, everything Synced/Healthy, then destroyed back to zero. ~$1 total cost. CPU-only by design: the GPU behaviour of the same operator is measured on the A10 fleet — this repo proves the platform chain is cloud-portable, and states so honestly. Findings documented in-repo: Free Plan instance-type restriction caught at ASG launch, `--server-side` apply required for ArgoCD CRDs, ignoreDifferences generalized in Git and reconciled by ArgoCD.
+
+**Stack** · Terraform (S3 backend, `use_lockfile`) · EKS 1.36, managed node group, API auth mode · ArgoCD app-of-apps · vllm-coldstart-operator via Helm
+
+[Repository, E2E evidence and findings →](https://github.com/MicheleCampi/eks-llm-inference-platform)
+
 ### vllm-coldstart-operator — cold-start-aware vLLM serving and GPU fleet orchestration
 A Rust operator (kube-rs) that treats cold start as a first-class lifecycle signal. Kubernetes marks a pod ready when its process is up; for an LLM server that's the wrong moment — the process is alive but still loading weights and warming the GPU. A VllmService reaches Ready only when it is warm and able to serve. It's the operational half of the cold-start line — the probe measures where cold start goes, this acts on it in-cluster.
 
@@ -112,4 +119,4 @@ Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
 
-In the last two years I extended that into computational infrastructure: production constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated under spot preemption, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs. The domain depth is what makes the systems work grounded; the technical execution is what makes it useful in production.
+In the last two years I extended that into computational infrastructure: production constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated under spot preemption, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs — with a public EKS twin demonstrating the same GitOps contract on AWS. The domain depth is what makes the systems work grounded; the technical execution is what makes it useful in production.
