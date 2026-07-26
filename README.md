@@ -99,22 +99,24 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 - **NVIDIA AIPerf** ([#1020](https://github.com/ai-dynamo/aiperf/pull/1020)) — credential redaction
 - **mistral.rs** ([#2189](https://github.com/EricLBuehler/mistral.rs/pull/2189)) — Prometheus metrics
 
+In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removing mid-stream TPOT predictions from the inference scheduler's Go codebase (−294/+16 across 6 Go files, `/lgtm` from the assigned maintainer).
+
 ---
 
 ## Recent technical writing
-Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github.io).
+15 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
 
 **Recent**
+
+- [CUDA graphs always speed the kernel. They don't always speed the server.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/26/cuda-graphs-tradeoff.html)
+- [Four GPUs, two sockets, one workload that didn't need any of it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/25/multigpu-tensor-parallel-a40.html)
+- [The client measured the cost. Only the per-device view measured the trade-off.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/18/vllm-disagg-profiling-1p1d.html)
 - [Disaggregation isn't a deployment topology. In llm-d, it's a per-request decision.](https://michelecampi.github.io/systems-engineering/llm-inference/2026/07/16/llm-d-decode-first-disaggregation.html) — a source read-through of the llm-d EPP scheduler: decode-first orchestration, the prefix-based disaggregation decider, and role-asymmetric recovery — why prefill is an optimization and decode is the contract (Jul 2026)
 - [NVIDIA's KV-router isn't faster. Under load it drops requests — and that's the design.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/06/27/dynamo-kv-router-saturation.html) — an A/B across a scaling curve on 8×A100: the KV-router sheds ~14% of requests under saturation to hold latency, traced to the Dynamo source at v1.2.0; the advantage inverts away from saturation (Jun 2026)
-- [The profiler had to teach me about the hardware. The hardware taught me about the profiler.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/06/05/h100-profiler-hardware-utilisation.html) — the L4 → H100 validation arc: a wrapper-PID bug found on L4, the fix, and what an H100 with a larger model revealed about both the profiler and the hardware budget (Jun 2026)
-- [Profiling LLM inference: what your /proc sampler isn't telling you](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/05/21/profiling-llm-inference-proc-sampler.html) — why a /proc-only view of an inference engine misses the resource that matters most, and how NVML sampling fills the gap (May 2026)
-- [Why your OpenTelemetry trace shows nothing useful when the CPU is doing all the work](https://michelecampi.github.io/observability/systems-engineering/2026/05/17/otel-tracing-compute-bound-services.html) — why default auto-instrumentation fails for compute-bound services, with before/after traces on a real CP-SAT workload (May 2026)
 
 [Full archive →](https://michelecampi.github.io)
 
 **Upcoming**
-- A cold-start series built on vllm-coldstart-probe: where vLLM cold start actually spends its time, the quantization cost — and the CUDA graphs trade-off, where measuring the full startup-vs-steady-state picture turned up a sign inversion that appears only on the larger model under saturation — not on model size alone — and that the kernel-level view couldn't predict
 - *From terraform apply to a warm model* — the GKE inference platform capstone: IaC → GitOps → a served vLLM model, and the managed-GPU debugging it took (Aug 2026)
 - *The energy signature of KV-cache reuse* — +69% tokens/joule across hit-rate regimes in agentic workloads, and why the number is a conservative bound (Aug 2026)
 
