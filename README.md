@@ -2,7 +2,7 @@ Hi, I'm Michele 👋
 
 **AI Infrastructure Engineer.** I design and build infrastructure end-to-end — Rust Kubernetes operators, IaC→GitOps platforms on GKE, observability — with depth in LLM inference (profiling, serving, energy). Proven end-to-end on real GPUs. I trace behaviour to the source and measure what really happens under load; my work is reproducible, documented (ADRs, runbooks), and validated, not demoed. AI-assisted and async-first.
 
-🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · 📊 [OptimEngine live dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) · ✍️ [Technical writing](https://michelecampi.github.io)
+🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
 
 ---
 
@@ -84,8 +84,8 @@ An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100,
 
 [Repository with raw results, analysis scripts, and the full evidence chain →](https://github.com/MicheleCampi/dynamo-kv-router-ab) · *write-up upcoming (June 2026)*
 
-### OptimEngine — production OR-Tools optimisation service
-A production constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: it's a real service that has run in production with full observability, not a demo — the engineering discipline transfers regardless of domain.
+### OptimEngine — deployed OR-Tools optimisation service
+A deployed constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: a self-taught project taken all the way to a deployed, observed, continuously running service — [live public dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) — not a demo — the engineering discipline transfers regardless of domain.
 
 **Stack** · Python 3.12 · FastAPI · OR-Tools CP-SAT 9.15 · OpenTelemetry distributed tracing · Prometheus + Grafana Cloud (live public dashboard) · Grafana Alloy · Railway · payment-gating layer built on x402 (Base/Solana) as part of the architecture
 
@@ -121,4 +121,4 @@ Cadence ~1 article/month on [michelecampi.github.io](https://michelecampi.github
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
 
-In the last two years I extended that into computational infrastructure: production constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated under spot preemption, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs — with a public EKS twin demonstrating the same GitOps contract on AWS. The domain depth is what makes the systems work grounded; the technical execution is what makes it useful in production.
+In the last two years I extended that into computational infrastructure: deployed constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated under spot preemption, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs — with a public EKS twin demonstrating the same GitOps contract on AWS. The domain depth is what makes the systems work grounded; the technical execution is what makes it hold up under real load.
