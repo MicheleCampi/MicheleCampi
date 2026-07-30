@@ -48,15 +48,17 @@ A Rust profiler that drives an OpenAI-compatible inference engine through its HT
 
 **Hygiene** · MSRV pinned via rust-toolchain.toml · fourteen Architecture Decision Records · SECURITY.md with explicit threat model · RUNBOOK.md with failure scenarios from real validation runs (Detection → Diagnosis → Fix) · documented pre-flight gate in CONTRIBUTING.md, enforced publicly by five CI jobs including one that builds every optional feature · Apache-2.0
 
-### Energy signature of KV-cache reuse in agentic workloads — +69% tokens/joule
+### [Energy signature of KV-cache reuse in agentic workloads](https://github.com/MicheleCampi/agentic-kv-energy-experiment) — +69% tokens/joule
 
 An 18-run controlled experiment measuring how KV-cache hit rate changes the energy cost of agentic (ReAct-style) inference — Qwen2.5-32B on a single H100 SXM5, vLLM. Three regimes sweep prefix reuse from cold prompts (H0) to heavy shared-prefix reuse (H2): tokens/joule rises monotonically 5.69 → 6.92 → 9.63 — **+69.2% at H2 vs H0** (window-based), std < 3% everywhere, and the gradient survives intact under an injected-failure condition. The figure is a conservative bound: the fixed measurement window's idle tail is longest exactly where efficiency is highest, so exact active-window attribution would widen the gradient, not shrink it. The workload is prefill-dominated by design — constant short generation, the shape of agentic loops with long shared context and short tool-call outputs — so the gradient is a prefill/KV-reuse effect.
+
+A second result came out of the same evidence: the two bases ADR-012 uses to apportion window energy to prefill and decode diverge monotonically with hit-rate into three non-overlapping bands, and the movement is entirely on the time-share side — `share_prefill_tok` stays flat at 0.996 across all 18 cells because a prompt-token counter has no term that responds to cache reuse, while measured prefill time collapses 91%. Per-token energy attribution is structurally blind to the optimisation it is meant to describe.
 
 **What it demonstrates** · KV-cache hit-rate and hardware energy read on one shared clock (inferscope ADR-011 Prometheus scrape + NVML energy counter, ADR-012 per-phase attribution) · a measurement campaign run to a pre-committed acceptance matrix — 18/18 cells, zero aborts, zero exclusions, anomalies kept and documented · process discipline: mandatory node-off dress rehearsal against a fake engine before every GPU session, established after a hardening cycle that caught a silently-null energy path in the instrumentation itself
 
 **Stack** · vLLM · Qwen2.5-32B bf16 · 1× H100 80GB SXM5 · inferscope (KV scrape + NVML energy) · every number regenerable from committed analysis scripts
 
-*Repository public at article go-live (Aug 2026).*
+*Repository public; [write-up](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html) published 30 July 2026.*
 
 ### CUDA graphs trade-off — when graphs stop paying off
 
@@ -66,7 +68,7 @@ A 40-run controlled experiment isolating one vLLM flag — `enforce_eager` — a
 
 **Stack** · vLLM 0.23.0 · 1× H100 80GB · Qwen2.5-7B/32B bf16 · inferscope (per-device NVML, full-bench energy window) + vllm bench serve · 12-run energy matrix (tokens/joule, 3 reps/cell) adds energy as a third axis to the throughput study · idempotent Rust-disciplined Python orchestrator · reproducible: every number regenerable from committed analysis scripts — `deep_analysis.py` over 40 throughput result files, `aggregate_energy.py` over the 12 energy JSON, with a PROVENANCE.md pinning hardware/driver/CUDA
 
-Repository public at article go-live (Jul–Aug 2026).
+*Repository public; [write-up](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/26/cuda-graphs-tradeoff.html) published 26 July 2026.*
 
 ### vllm-coldstart-probe — eBPF profiler for vLLM cold start
 A Rust/eBPF tool that traces vLLM cold start at the kernel and driver boundary — the layer where process-level profilers stop. It attaches syscall tracepoints (openat, read, mmap, close) and uprobes on the libcuda C API (cuInit, cuModuleLoadData, cuMemAlloc, cuLaunchKernel), correlating both families on one timeline to answer where the seconds between "process start" and "first token" actually go. Complements inferscope: that profiler looks down from the process, this one looks up from the kernel — cold start is split across exactly the seam where most tools stop.
@@ -104,10 +106,11 @@ In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) 
 ---
 
 ## Recent technical writing
-15 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
+16 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
 
 **Recent**
 
+- [KV-cache reuse is an energy lever. Per-token attribution can't see it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html) — +69.2% tokens/joule from cold prompts to 93% prefix reuse on an H100, and why the token-share half of the energy apportionment never moves (Jul 2026)
 - [CUDA graphs always speed the kernel. They don't always speed the server.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/26/cuda-graphs-tradeoff.html)
 - [Four GPUs, two sockets, one workload that didn't need any of it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/25/multigpu-tensor-parallel-a40.html)
 - [The client measured the cost. Only the per-device view measured the trade-off.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/18/vllm-disagg-profiling-1p1d.html)
@@ -118,7 +121,6 @@ In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) 
 
 **Upcoming**
 - *From terraform apply to a warm model* — the GKE inference platform capstone: IaC → GitOps → a served vLLM model, and the managed-GPU debugging it took (Aug 2026)
-- *The energy signature of KV-cache reuse* — +69% tokens/joule across hit-rate regimes in agentic workloads, and why the number is a conservative bound (Aug 2026)
 
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
