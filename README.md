@@ -1,6 +1,6 @@
 Hi, I'm Michele 👋
 
-**AI Infrastructure Engineer.** I design and build infrastructure end-to-end — Rust Kubernetes operators, IaC→GitOps platforms on GKE, observability — with depth in LLM inference (profiling, serving, energy). Proven end-to-end on real GPUs. I trace behaviour to the source and measure what really happens under load; my work is reproducible, documented (ADRs, runbooks), and validated, not demoed. AI-assisted and async-first.
+**AI Platform Engineer.** I build the platforms that serve LLM inference — Kubernetes operators in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so a GPU fleet places and recovers itself, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
 
 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
 
@@ -101,7 +101,7 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 - **NVIDIA AIPerf** ([#1020](https://github.com/ai-dynamo/aiperf/pull/1020)) — credential redaction
 - **mistral.rs** ([#2189](https://github.com/EricLBuehler/mistral.rs/pull/2189)) — Prometheus metrics
 
-In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removing mid-stream TPOT predictions from the inference scheduler's Go codebase (−294/+16 across 6 Go files, `/lgtm` from the assigned maintainer).
+In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removing mid-stream TPOT predictions from the inference scheduler's Go codebase (−294/+16 across 6 Go files), under review by the assigned maintainer.
 
 ---
 
