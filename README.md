@@ -84,7 +84,7 @@ An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100,
 
 **Stack** · NVIDIA Dynamo 1.2.0 · vLLM runtime · Qwen3-8B · AIPerf fixed-schedule replay · inferscope `--sample-only` for server-side GPU telemetry · 8×A100-SXM4-40GB
 
-[Repository with raw results, analysis scripts, and the full evidence chain →](https://github.com/MicheleCampi/dynamo-kv-router-ab) · *write-up upcoming (June 2026)*
+[Repository with raw results, analysis scripts, and the full evidence chain →](https://github.com/MicheleCampi/dynamo-kv-router-ab) · *[write-up](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/06/27/dynamo-kv-router-saturation.html) published 27 June 2026.*
 
 ### OptimEngine — deployed OR-Tools optimisation service
 A deployed constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: a self-taught project taken all the way to a deployed, observed, continuously running service — [live public dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) — not a demo — the engineering discipline transfers regardless of domain.
