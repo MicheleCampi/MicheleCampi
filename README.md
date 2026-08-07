@@ -110,11 +110,12 @@ In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) 
 ---
 
 ## Recent technical writing
-16 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
+17 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
 
 **Recent**
 
-- [KV-cache reuse is an energy lever. Per-token attribution can't see it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html) — +69.2% tokens/joule from cold prompts to 93% prefix reuse on an H100, and why the token-share half of the energy apportionment never moves (Jul 2026)
+- [Releasing the GPU while your agent waits is the obvious move. It saves nothing.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/06/agentic-trajectory-cost.html) — the cost of generating holds flat within 0.5% across fifteen cells while the cost of waiting grows 25x, so the whole +56% in $/M token is allocation; and the obvious reclaim policy repays on none of them (Aug 2026)
+- [KV-cache reuse is an energy lever. Per-token attribution can't see it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html)
 - [CUDA graphs always speed the kernel. They don't always speed the server.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/26/cuda-graphs-tradeoff.html)
 - [Four GPUs, two sockets, one workload that didn't need any of it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/25/multigpu-tensor-parallel-a40.html)
 - [The client measured the cost. Only the per-device view measured the trade-off.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/18/vllm-disagg-profiling-1p1d.html)
