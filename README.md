@@ -110,11 +110,12 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 ---
 
 ## Recent technical writing
-17 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
+18 articles since April 2026 (~4/month) on [michelecampi.github.io](https://michelecampi.github.io).
 
 **Recent**
 
-- [Releasing the GPU while your agent waits is the obvious move. It saves nothing.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/06/agentic-trajectory-cost.html) — the cost of generating holds flat within 0.5% across fifteen cells while the cost of waiting grows 25x, so the whole +56% in $/M token is allocation; and the obvious reclaim policy repays on none of them (Aug 2026)
+- [Six things that were wrong, and the checks that found them before anyone else did](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/16/checks-that-found-them.html) — six defects across a GPU campaign, a translation and a config for someone else's codebase. Three of them were in the checking rather than the work: a test that passed against broken code, a dry-run blind at the one value that mattered, a loader test that could not fail (Aug 2026)
+- [Releasing the GPU while your agent waits is the obvious move. It saves nothing.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/06/agentic-trajectory-cost.html)
 - [KV-cache reuse is an energy lever. Per-token attribution can't see it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html)
 - [CUDA graphs always speed the kernel. They don't always speed the server.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/26/cuda-graphs-tradeoff.html)
 - [Four GPUs, two sockets, one workload that didn't need any of it.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/25/multigpu-tensor-parallel-a40.html)
