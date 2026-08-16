@@ -102,10 +102,10 @@ A deployed constraint-solving service exposing OR-Tools CP-SAT through both a RE
 ## Open-source contributions
 Beyond my own repositories, merged contributions to inference/AI-infrastructure projects — evidence of working inside large unfamiliar codebases to the standard their maintainers require:
 
+- **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removed the mid-stream TPOT prediction path from the inference scheduler's Go codebase (−296/+16 across 6 files), on an issue a maintainer had assigned to me. The sampled mid-stream prediction was observability-only and computed from a scheduling-time snapshot, averaged together with an incommensurate quantity; removing it also closed a train/serve inconsistency in the gauge it read.
 - **NVIDIA AIPerf** ([#1020](https://github.com/ai-dynamo/aiperf/pull/1020)) — credential redaction
 - **mistral.rs** ([#2189](https://github.com/EricLBuehler/mistral.rs/pull/2189)) — Prometheus metrics
 
-In review: **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removing mid-stream TPOT predictions from the inference scheduler's Go codebase (−296/+16 across 6 Go files), under review by the assigned maintainer.
 
 ---
 
