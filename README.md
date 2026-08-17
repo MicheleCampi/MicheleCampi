@@ -41,6 +41,15 @@ A Rust operator (kube-rs) that treats cold start as a first-class lifecycle sign
 
 **Stack** · Rust · kube-rs 2.x · k8s-openapi 0.26 (Kubernetes 1.34) · server-side apply · status subresource · CI with an end-to-end job on an ephemeral kind cluster (asserts the full lifecycle, owner reference, garbage collection) · public OpenMetrics endpoint · two-tag GHCR release pipeline · Apache-2.0
 
+### model-promotion-bridge — the registry decides, the cluster serves that
+A GPU session in July left a provenance file with the container image pinned by digest and the model snapshot as a bare commit SHA typed in by hand after the run — because the manifest that produced it declared `model: Qwen/Qwen2.5-7B-Instruct`, a name with no revision. Two artefacts in the same pod, one reproducible and one not, and nothing in the manifest showed which was which. This reads what MLflow has promoted under an alias and renders the `VllmService` that serves exactly that revision, pinned in `extraArgs` where vLLM reads it and in annotations where a reader who does not know vLLM's flags can still see what was served and who decided it.
+
+**Three decisions** · it emits YAML rather than calling the Kubernetes API, so the result is reviewable before it lands, diffable against what runs, and replayable from git — and the bridge holds no cluster credentials · the operator never learns MLflow exists, because coupling a platform component to one vendor's registry is a cost paid on every future change · a promoted version carrying no revision tag stops the pipeline instead of falling back to `main`, which would deploy whatever the model repo holds that day.
+
+**Scope, stated** · it trains, tunes and evaluates nothing: the weights are third-party and the registry records their provenance rather than claiming authorship. It is also not a promotion *policy* — deciding a version deserves the alias is a human judgement this reads and does not make.
+
+**Stack** · Python · MLflow 3.15 (sqlite-backed registry, not a mock in the tests) · PyYAML · pytest · manifest validated with `kubectl apply --dry-run=server` against the CRD schema the operator generates · Apache-2.0 · [repo](https://github.com/MicheleCampi/model-promotion-bridge)
+
 ### inferscope — profiler and observability for LLM inference engines
 A Rust profiler that drives an OpenAI-compatible inference engine through its HTTP API, captures per-token timing end-to-end, and correlates that timing with the engine process's CPU and GPU resource usage on a single shared wall clock. The point is the correlation: client-side latency and server-side hardware behaviour are two different truths, and the gap between them is where most inference performance problems hide. Outputs a plain-text report for terminal reading and a JSON document carrying both raw signals and derived metrics (TTFT, tokens-per-second excluding TTFT, inter-token latency percentiles, RSS aggregations, VRAM and per-device SM utilisation for multi-GPU runs).
 
