@@ -75,6 +75,8 @@ A second campaign measures a different axis on the same workload: cost against t
 
 **Stack** · vLLM 0.23.0 · Qwen2.5-32B bf16 on 1× H100 80GB SXM5, Qwen2.5-7B on 1× A10 · inferscope (KV scrape + NVML energy + per-trajectory cost attribution) · every number regenerable from committed analysis scripts and per-cell evidence
 
+**Why these three sit together** · separately they are an energy result, a cost result and a packing bound. Together they answer one question that anyone running agents on their own GPUs has to answer: **how many concurrent trajectories does a replica actually hold, and what does each one cost while it waits?** The energy campaign gives the per-trajectory cost of the cache regime, the cost campaign shows that the increase is allocation rather than work, and the bound — tested on hardware rather than shipped — says how many fit before the arithmetic breaks. That is capacity planning for agent infrastructure, measured rather than modelled. The limit is stated with it: the trajectories in the bound test ran in lockstep and shared their idle time instead of interleaving, so the packing figure holds for synchronised replicas and the staggered case is still open.
+
 *Repository public; [write-up](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/07/30/agentic-kv-energy.html) published 30 July 2026.*
 
 ### CUDA graphs trade-off — when graphs stop paying off
