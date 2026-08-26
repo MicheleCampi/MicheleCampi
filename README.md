@@ -118,6 +118,7 @@ A deployed constraint-solving service exposing OR-Tools CP-SAT through both a RE
 Beyond my own repositories, merged contributions to inference/AI-infrastructure projects — evidence of working inside large unfamiliar codebases to the standard their maintainers require:
 
 - **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037)) — removed the mid-stream TPOT prediction path from the inference scheduler's Go codebase (−296/+16 across 6 files), on an issue a maintainer had opened, which I claimed with the plan for how I would do it before writing any code, and then took through their review to merge. The sampled mid-stream prediction was observability-only and computed from a scheduling-time snapshot, averaged together with an incommensurate quantity; removing it also closed a train/serve inconsistency in the gauge it read.
+- **llm-d** ([#2393](https://github.com/llm-d/llm-d-router/pull/2393)) — parity coverage between the endpoint-attribute scorer and the legacy ones it replaces, plus a benchmark config. The reviewer noticed that the comment block at the top of my test file described an asymmetry no case exercised — absence reads as *best* on the legacy path and *worst* on the attribute path — which was true, so the PR gained the test that pins it. Merged +233/−0.
 - **NVIDIA AIPerf** ([#1020](https://github.com/ai-dynamo/aiperf/pull/1020)) — credential redaction
 - **mistral.rs** ([#2189](https://github.com/EricLBuehler/mistral.rs/pull/2189)) — Prometheus metrics
 
