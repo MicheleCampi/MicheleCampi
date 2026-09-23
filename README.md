@@ -127,6 +127,7 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 - **vLLM** ([#54990](https://github.com/vllm-project/vllm/pull/54990)) — `CachingMetrics.hit_rate` returns `0.0` when no queries have been observed, so a server that had not yet served a prefix-cacheable request logged `Prefix cache hit rate: 0.0%` — the cache missing everything, rather than nothing asked of it yet. The two other cache metrics on the same log line already guarded on `empty`; the main prefix-cache one did not
 - **NVIDIA AIPerf** ([#1020](https://github.com/ai-dynamo/aiperf/pull/1020)) — credential redaction
 - **mistral.rs** ([#2189](https://github.com/EricLBuehler/mistral.rs/pull/2189)) — Prometheus metrics
+- **llm-d** ([#2822](https://github.com/llm-d/llm-d-router/issues/2822)) — reported and specified, fixed upstream and merged as [#2848](https://github.com/llm-d/llm-d-router/pull/2848) by another contributor. Three legacy scorers read a never-scraped endpoint's zero-value `Metrics` as a genuine idle observation, so it scored 1.0 and outranked pods with real load — and on the two range-normalised scorers it also set the population minimum, compressing everyone else. The report carried the scores from running the three scorers, the unfiltered candidate path that lets such an endpoint through, and the project's own opposite convention in its saturation detector. The fix adds a `Metrics.Updated()` predicate and adopts it in all three: an unscraped endpoint is now left unscored and excluded from the min–max range.
 
 
 ---
