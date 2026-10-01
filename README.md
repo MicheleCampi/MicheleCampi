@@ -1,6 +1,6 @@
 Hi, I'm Michele 👋
 
-**AI Platform Engineer.** I build the platforms that serve LLM inference — Kubernetes operators in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so a GPU fleet places and recovers itself, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
+**AI Platform Engineer.** I build the platforms that serve LLM inference — Kubernetes operators in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so a GPU fleet places and recovers itself, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, multi-tenant LoRA, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
 
 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
 
@@ -16,6 +16,14 @@ The capstone that ties the inference work together: a reproducible Terraform-pro
 **Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
 
 *Repository public at article go-live (Aug 2026); engineering post-mortem written.*
+
+### [What multi-tenant LoRA costs](https://github.com/MicheleCampi/lora-multitenancy-experiment) — the number of adapters costs, the imbalance does not
+
+vLLM 0.30.0 counts the requests each LoRA adapter has running or waiting and exports only the adapter names; llm-d's router stores a zero for each and its scorer uses them as a set — so a pod giving one adapter 90% of its traffic and one giving it 5% look identical. Before proposing a fix to three projects, this measures whether the missing signal is worth anything. Protocol committed before any node was booked; 56 cells on one A10, vLLM 0.30.0, Qwen2.5-7B with eight public rank-16 adapters, energy from the NVML counter net of idle power. **Eight adapters cost +7.05% energy per generated token against one at concurrency 128 and +5.96% at 64 — H1 not falsified — most of it between four and eight. Sending 75% of the requests to one adapter, at two, four or eight, moved the cost by +0.11% to +0.60%, inside the band of repetitions in all six judgements — H2 falsified.** For cost per token, the signal the three projects drop would not have told two such pods apart. The metric that decides was fixed before the campaign, and it matters: on raw energy the margins are +2.90% and +2.40% and H1 would have been falsified — that the choice of metric decides the outcome is stated in the protocol, with the dry run's figures, before the campaign.
+
+**What it demonstrates** · a falsification design fixed before the data, amended in dated sections before the first cell · both ends of every joint the verdict crosses read at source — vLLM's benchmark, inferscope's energy counter, the harness — and the data checked against them on every cell · a negative result for the obvious fix, published as the answer
+
+**Stack** · vLLM 0.30.0 · `vllm bench serve` · Qwen2.5-7B-Instruct + 8 LoRA adapters (r=16) · 1× A10 · inferscope (NVML energy) · every figure recomputed from the committed evidence — [results](https://github.com/MicheleCampi/lora-multitenancy-experiment/blob/main/RESULTS.md)
 
 ### EKS twin — the same GitOps contract on AWS (public now)
 The AWS counterpart of the GKE capstone, built and E2E-validated in a single session: Terraform-provisioned EKS 1.36 (S3 state backend with native lockfile, access entries in API mode), ArgoCD app-of-apps, and the cold-start operator deployed via GitOps — three CRDs served, everything Synced/Healthy, then destroyed back to zero. ~$1 total cost. CPU-only by design: the GPU behaviour of the same operator is measured on the A10 fleet — this repo proves the platform chain is cloud-portable, and states so honestly. Findings documented in-repo: Free Plan instance-type restriction caught at ASG launch, `--server-side` apply required for ArgoCD CRDs, ignoreDifferences generalized in Git and reconciled by ArgoCD.
