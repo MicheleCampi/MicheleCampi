@@ -15,7 +15,7 @@ The capstone that ties the inference work together: a reproducible Terraform-pro
 
 **Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
 
-*Repository public at article go-live (Aug 2026); engineering post-mortem written.*
+*Repository private for now; the same GitOps contract is public in the EKS twin below. Engineering post-mortem written.*
 
 ### [What multi-tenant LoRA costs](https://github.com/MicheleCampi/lora-multitenancy-experiment) — the number of adapters costs, the imbalance does not
 
