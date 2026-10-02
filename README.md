@@ -9,11 +9,11 @@ Hi, I'm Michele 👋
 ## Featured work
 
 ### GKE platform — IaC → GitOps, end to end (serving a real vLLM workload)
-The capstone that ties the inference work together: a reproducible Terraform-provisioned GKE cluster (regional, Workload Identity, shielded nodes, scale-to-zero GPU node pool) running an ArgoCD app-of-apps that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity), and a Grafana Alloy → Mimir observability pipeline — then drives a real vLLM workload on the GPU through it. One `terraform apply` to a served, warm, observable model; one `terraform destroy` back to zero. The phase timeline of a real cold start lands on a Grafana dashboard as the signature artifact.
+The capstone that ties the inference work together: Terraform provisions a regional GKE cluster with Workload Identity, a CPU system pool and a scale-to-zero L4 GPU pool; ArgoCD, installed once with Helm, then reconciles an app-of-apps — itself included — that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity) and a Grafana Alloy pipeline remote-writing the operator's metrics to Grafana Cloud, and drives a real vLLM workload, Qwen2.5-7B-Instruct on the L4, from Pending through Warming to Ready. The GCP service account, its IAM bindings, the secret and the state bucket are created with `gcloud` outside Terraform. Torn down with `terraform destroy` once validated.
 
 **What it demonstrates** · platform engineering across the whole path: infrastructure as code, GitOps reconciliation, secret management without secrets in git, in-cluster observability, and GPU workload lifecycle — plus the debugging that only surfaces on real managed GPUs (admission, invocation, dynamic linker), captured as a written post-mortem
 
-**Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy + Mimir remote_write · vllm-coldstart-operator serving Qwen2.5-7B
+**Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy → Grafana Cloud (remote_write) · vllm-coldstart-operator serving Qwen2.5-7B
 
 *Repository private for now; the same GitOps contract is public in the EKS twin below. Engineering post-mortem written.*
 
