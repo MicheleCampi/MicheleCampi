@@ -23,7 +23,7 @@ vLLM 0.30.0 counts the requests each LoRA adapter has running or waiting and exp
 
 **What it demonstrates** · a falsification design fixed before the data, amended in dated sections before the first cell · both ends of every joint the verdict crosses read at source — vLLM's benchmark, inferscope's energy counter, the harness — and the data checked against them on every cell · a negative result for the obvious fix, published as the answer
 
-**Stack** · vLLM 0.30.0 · `vllm bench serve` · Qwen2.5-7B-Instruct + 8 LoRA adapters (r=16) · 1× A10 · inferscope (NVML energy) · every figure recomputed from the committed evidence — [results](https://github.com/MicheleCampi/lora-multitenancy-experiment/blob/main/RESULTS.md)
+**Stack** · vLLM 0.30.0 · `vllm bench serve` · Qwen2.5-7B-Instruct + 8 LoRA adapters (r=16) · 1× A10 · inferscope (NVML energy) · every figure recomputed from the committed evidence — [results](https://github.com/MicheleCampi/lora-multitenancy-experiment/blob/main/RESULTS.md) · [article](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/10/02/multi-tenant-lora-cost.html)
 
 ### EKS twin — the same GitOps contract on AWS (public now)
 The AWS counterpart of the GKE capstone, built and E2E-validated in a single session: Terraform-provisioned EKS 1.36 (S3 state backend with native lockfile, access entries in API mode), ArgoCD app-of-apps, and the cold-start operator deployed via GitOps — three CRDs served, everything Synced/Healthy, then destroyed back to zero. ~$1 total cost. CPU-only by design: the GPU behaviour of the same operator is measured on the A10 fleet — this repo proves the platform chain is cloud-portable, and states so honestly. Findings documented in-repo: Free Plan instance-type restriction caught at ASG launch, `--server-side` apply required for ArgoCD CRDs, ignoreDifferences generalized in Git and reconciled by ArgoCD.
@@ -141,10 +141,11 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 ---
 
 ## Recent technical writing
-19 articles since April 2026 on [michelecampi.github.io](https://michelecampi.github.io).
+20 articles since April 2026 on [michelecampi.github.io](https://michelecampi.github.io).
 
 **Recent**
 
+- [Eight LoRA adapters cost 6–7% more per token. Skewing the traffic among them doesn't.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/10/02/multi-tenant-lora-cost.html) — 56 cells on an A10 asking whether the per-adapter request counts vLLM computes and never exports would tell a router anything about cost. Eight adapters cost +7.05% and +5.96% energy per generated token against one, net of idle; sending 75% of the requests to one adapter moved it +0.11% to +0.60%, inside the band of repetitions in all six judgements. Judged on raw energy, the first result would have been falsified — which is why the metric was fixed before the campaign (Oct 2026)
 - [Speculative decoding pays before it accepts anything.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/09/05/speculative-decoding-energy.html) — eleven runs on an H100 looking for the acceptance rate where speculation stops being worth its energy. There isn't one: at zero acceptance, with 652,880 draft tokens computed and none accepted, it still commits tokens at 0.897× the baseline. The forward pass carries 1+k queries instead of 1, and decode is memory-bandwidth-bound (Sep 2026)
 - [Six things that were wrong, and the checks that found them before anyone else did](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/16/checks-that-found-them.html) — six defects across a GPU campaign, a translation and a config for someone else's codebase. Three of them were in the checking rather than the work: a test that passed against broken code, a dry-run blind at the one value that mattered, a loader test that could not fail (Aug 2026)
 - [Releasing the GPU while your agent waits is the obvious move. It saves nothing.](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/08/06/agentic-trajectory-cost.html)
