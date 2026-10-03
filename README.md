@@ -8,14 +8,14 @@ Hi, I'm Michele 👋
 
 ## Featured work
 
-### GKE platform — IaC → GitOps, end to end (serving a real vLLM workload)
+### [GKE platform](https://github.com/MicheleCampi/gke-llm-inference-platform) — IaC → GitOps, end to end (serving a real vLLM workload)
 The capstone that ties the inference work together: Terraform provisions a regional GKE cluster with Workload Identity, a CPU system pool and a scale-to-zero L4 GPU pool; ArgoCD, installed once with Helm, then reconciles an app-of-apps — itself included — that deploys the cold-start operator, external-secrets (GCP Secret Manager via Workload Identity) and a Grafana Alloy pipeline remote-writing the operator's metrics to Grafana Cloud, and drives a real vLLM workload, Qwen2.5-7B-Instruct on the L4, from Pending through Warming to Ready. The GCP service account, its IAM bindings, the secret and the state bucket are created with `gcloud` outside Terraform. Torn down with `terraform destroy` once validated.
 
 **What it demonstrates** · platform engineering across the whole path: infrastructure as code, GitOps reconciliation, secret management without secrets in git, in-cluster observability, and GPU workload lifecycle — plus the debugging that only surfaces on real managed GPUs (admission, invocation, dynamic linker), captured as a written post-mortem
 
 **Stack** · Terraform (GCS backend, module structure) · GKE regional + L4 GPU node pool (scale-to-zero, ExtendedResourceToleration) · ArgoCD app-of-apps with sync waves · external-secrets + GCP Secret Manager + Workload Identity · Grafana Alloy → Grafana Cloud (remote_write) · vllm-coldstart-operator serving Qwen2.5-7B
 
-*Repository private for now; the same GitOps contract is public in the EKS twin below. Engineering post-mortem written.*
+*End to end on a real L4, 2026-06-14: [evidence](https://github.com/MicheleCampi/gke-llm-inference-platform/tree/main/docs/evidence/e2e-2026-06-14) · [debugging narrative](https://github.com/MicheleCampi/gke-llm-inference-platform/blob/main/docs/phase3-narrative.md).*
 
 ### [What multi-tenant LoRA costs](https://github.com/MicheleCampi/lora-multitenancy-experiment) — the number of adapters costs, the imbalance does not
 
@@ -25,7 +25,7 @@ vLLM 0.30.0 counts the requests each LoRA adapter has running or waiting and exp
 
 **Stack** · vLLM 0.30.0 · `vllm bench serve` · Qwen2.5-7B-Instruct + 8 LoRA adapters (r=16) · 1× A10 · inferscope (NVML energy) · every figure recomputed from the committed evidence — [results](https://github.com/MicheleCampi/lora-multitenancy-experiment/blob/main/RESULTS.md) · [article](https://michelecampi.github.io/observability/systems-engineering/llm-inference/2026/10/02/multi-tenant-lora-cost.html)
 
-### EKS twin — the same GitOps contract on AWS (public now)
+### [EKS twin](https://github.com/MicheleCampi/eks-llm-inference-platform) — the same operator and app-of-apps on AWS
 The AWS counterpart of the GKE capstone, built and E2E-validated in a single session: Terraform-provisioned EKS 1.36 (S3 state backend with native lockfile, access entries in API mode), ArgoCD app-of-apps, and the cold-start operator deployed via GitOps — three CRDs served, everything Synced/Healthy, then destroyed back to zero. ~$1 total cost. CPU-only by design: the GPU behaviour of the same operator is measured on the A10 fleet — this repo proves the platform chain is cloud-portable, and states so honestly. Findings documented in-repo: Free Plan instance-type restriction caught at ASG launch, `--server-side` apply required for ArgoCD CRDs, ignoreDifferences generalized in Git and reconciled by ArgoCD.
 
 **Stack** · Terraform (S3 backend, `use_lockfile`) · EKS 1.36, managed node group, API auth mode · ArgoCD app-of-apps · vllm-coldstart-operator via Helm
@@ -164,4 +164,4 @@ Beyond my own repositories, merged contributions to inference/AI-infrastructure 
 ## Background
 Nine years building quantitative systems for industrial operations — cost-by-workcenter modelling, margin frameworks, capacity analysis, forecasting infrastructure for mid-market manufacturers. Finance and Risk Management degree, 2013.
 
-In the last two years I extended that into computational infrastructure: deployed constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated under spot preemption, and a full IaC → GitOps → inference platform on GKE proven end-to-end on real GPUs — with a public EKS twin demonstrating the same GitOps contract on AWS. The domain depth is what makes the systems work grounded; the technical execution is what makes it hold up under real load.
+In the last two years I extended that into computational infrastructure: deployed constraint solvers, observability stacks, two Rust profilers for LLM inference (one sampling the process from above via /proc + NVML, one tracing the kernel and driver from below via eBPF), a cold-start-aware Kubernetes operator grown into a GPU fleet orchestrator validated on a 3×A10 fleet against an injected preemption notice, and a full IaC → GitOps → inference platform on GKE proven end-to-end on a real L4 — with a public EKS twin running the same operator and app-of-apps on AWS. The domain depth is what makes the systems work grounded; the technical execution is what makes it hold up under real load.
