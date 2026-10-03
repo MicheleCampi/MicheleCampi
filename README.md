@@ -120,9 +120,9 @@ An A/B study of NVIDIA Dynamo's KV-aware router against round-robin, on 8×A100,
 ### OptimEngine — deployed OR-Tools optimisation service
 A deployed constraint-solving service exposing OR-Tools CP-SAT through both a REST API and an MCP interface: flexible job-shop scheduling, vehicle routing with time windows, stochastic optimisation with CVaR risk metrics, sensitivity and Pareto analysis. The reason it's here: a self-taught project taken all the way to a deployed, observed, continuously running service — [live public dashboard](https://optimengine.grafana.net/public-dashboards/21137ba340fc4b6e917a4b108db3e109) — not a demo — the engineering discipline transfers regardless of domain.
 
-**Stack** · Python 3.12 · FastAPI · OR-Tools CP-SAT 9.15 · OpenTelemetry distributed tracing · Prometheus + Grafana Cloud (live public dashboard) · Grafana Alloy · Railway · payment-gating layer built on x402 (Base/Solana) as part of the architecture
+**Stack** · Python 3.12 · FastAPI · OR-Tools CP-SAT 9.15 · OpenTelemetry tracing (OTLP) · Prometheus metrics · Grafana Alloy → Grafana Cloud (remote_write) · live public dashboard · Railway
 
-**Hygiene** · 121 tests, 77% coverage (88% on business-logic engines) · threat model in SECURITY.md · operational runbook for 5 incident classes · OpenTelemetry sub-spans inside the CP-SAT solver entry points · Alloy → Mimir remote_write pipeline · everything live, public, and verifiable — the dashboard, benchmarks, and test suite are in the open
+**Hygiene** · 121 tests in CI, 77% line coverage (85% across the eight solver engines) · threat model in SECURITY.md · operational runbook for 5 incident scenarios, with a postmortem template · OpenTelemetry spans on the solver entry points, with build / CP-SAT solve / extraction sub-spans in routing · everything live, public, and verifiable — the dashboard, benchmarks, and test suite are in the open
 
 ---
 
