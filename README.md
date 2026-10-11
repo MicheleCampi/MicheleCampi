@@ -1,6 +1,6 @@
 Hi, I'm Michele 👋
 
-**AI Inference Engineer.** I build the platforms that serve LLM inference — a Kubernetes operator in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so placement and recovery across a GPU fleet are decided by a controller, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, multi-tenant LoRA, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
+**AI Platform Engineer.** I build the platforms that serve LLM inference — a Kubernetes operator in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so placement and recovery across a GPU fleet are decided by a controller, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, multi-tenant LoRA, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
 
 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
 
