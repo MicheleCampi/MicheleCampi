@@ -2,7 +2,20 @@ Hi, I'm Michele 👋
 
 **AI Platform Engineer.** I build the platforms that serve LLM inference — a Kubernetes operator in Rust, Terraform→GitOps on GKE and AWS EKS, observability — so placement and recovery across a GPU fleet are decided by a controller, not by hand. I measure what serving costs: tokens per joule, KV-cache reuse, multi-tenant LoRA, cold start, failover, on real GPUs. Rust for the systems, Python for the measurement harnesses. I trace behaviour to the source; reproducible, documented (ADRs, runbooks), validated, not demoed. AI-assisted and async-first.
 
-🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
+🧭 [llm-inference-platform](https://github.com/MicheleCampi/llm-inference-platform) · 🌐 [inferscope](https://github.com/MicheleCampi/inferscope) · ⚙️ [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) · ✍️ [Technical writing](https://michelecampi.github.io)
+
+---
+
+## The platform, in one place
+
+[llm-inference-platform](https://github.com/MicheleCampi/llm-inference-platform) is the entry point:
+how the repositories below fit together as one inference platform, what is verified, how to verify it
+yourself, and what is not done yet.
+
+- **Roadmap:** 31 of 52 written items done, 4 partial (31 October 2026).
+- **Security:** a STRIDE threat model of 23 threats: 13 mitigated, 6 partly mitigated, 3 not mitigated,
+  1 not yet assessed. The open items are named with their next step. CI checks that the README counts
+  match the threat model; it does not make anything more secure.
 
 ---
 
