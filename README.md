@@ -32,4 +32,4 @@ Merged in **llm-d** ([#2037](https://github.com/llm-d/llm-d-router/pull/2037), [
 
 ## Background
 
-Nine years building cost and capacity models for manufacturers; Finance and Risk Management degree. That is why the platform starts from the budget.
+Eight years building cost and capacity models for manufacturers; Finance and Risk Management degree. That is why the platform starts from the budget.
