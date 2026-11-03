@@ -1,6 +1,6 @@
 Hi, I'm Michele 👋
 
-**AI Platform Engineer.** A team declares a model, a latency objective and a budget; the platform provisions, delivers, secures, observes and prices it. I build that platform, and every claim about it is checkable with a command.
+**Cloud Engineer, cost & GPU inference.** I build GPU inference infrastructure on GKE and AWS and put a price on it. A team declares a model, a latency objective and a budget; the platform provisions, delivers, secures, observes and prices it. Every claim is checkable with a command.
 
 🧭 [llm-inference-platform](https://github.com/MicheleCampi/llm-inference-platform), the entry point · ✍️ [Technical writing](https://michelecampi.github.io)
 
@@ -20,6 +20,7 @@ What is done, partial and missing is listed in the [roadmap and known gaps](http
 
 Every result has a protocol fixed before the data was collected, and negative results are published as results.
 
+- **Cost per token:** one L4 inside its SLOs costs 4.38–8.07 EUR per million generated tokens; every paid GPU session is reconciled against the real bill.
 - **Warmth-aware failover** on 3×A10: zero errors on the unaffected service, replacement Ready in 57 s before the old pod drained.
 - **Autoscaling that counts warming replicas:** 5.85× fewer replica-seconds than a naive autoscaler (kind + simulator).
 - **Agentic workloads:** [+69% tokens/joule from KV reuse; "release the GPU during tool calls" falsified on 15/15 cells](https://github.com/MicheleCampi/agentic-kv-energy-experiment).
