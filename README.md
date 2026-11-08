@@ -12,6 +12,7 @@ Every number on this page links to the evidence behind it.
 
 - **Decisions in writing.** 25 architecture decision records in the operator, each stating its evidence; a STRIDE threat model whose counts CI checks.
 - **Budget first, bill after.** Every paid GPU session has a cap approved before it starts and is reconciled against the real bill afterwards.
+- **Incidents reviewed in writing.** Three blameless [postmortems](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/postmortems/README.md) of real incidents (GPU stockouts in two regions, a billing line nobody estimated, a CI apply that failed halfway), each fix a merged PR; a [platform runbook](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/runbook.md) and a [production readiness review](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/prr.md) with what is still open.
 - **Reproducible by default.** Protocols are fixed before data is collected, results ship with the command that regenerates them, negative results are published.
 - **Gaps stated, not hidden.** Every repository lists what is not done yet.
 - **End to end.** From Terraform and CI to a Rust operator to fixes merged upstream.
