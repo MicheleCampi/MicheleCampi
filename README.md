@@ -21,7 +21,7 @@ Every number on this page links to the evidence behind it.
 
 | Repository | What it shows |
 |---|---|
-| [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: cut-over in 158 s with 83/83 health checks at 200, rollback in 174 s with 91/91. |
+| [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: cut-over in 158 s with 83/83 health checks at 200, rollback in 174 s with 91/91. [Case study](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/case-study.md). |
 | [gke-llm-inference-platform](https://github.com/MicheleCampi/gke-llm-inference-platform) | Terraform and Argo CD on GKE: scale-to-zero L4 pool, keyless `terraform plan` on every PR, signed release tags. |
 | [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | The AWS twin on EKS, `terraform test` in CI with pinned tools. |
 | [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost; 104 unit tests and end-to-end jobs on kind. |
