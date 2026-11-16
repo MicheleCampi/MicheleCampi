@@ -8,7 +8,7 @@ Every number on this page links to the evidence behind it.
 
 **How I deliver: AI-native, human in the loop.** An AI coding agent writes the code; I design,
 decide in written records, review and merge every pull request, approve every cost before it is
-spent, and run the live sessions.
+spent, and run the live sessions. [How I work with AI](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/how-i-work-with-ai.md).
 
 **Open to remote roles** · Italy (CET), async-first · Italian (native), English (professional) · [LinkedIn](https://www.linkedin.com/in/michele-campi)
 
