@@ -2,7 +2,7 @@
 
 **Cloud Infrastructure Engineer · GPU & LLM inference · AWS, GCP, Kubernetes, Terraform**
 
-I design and run cloud infrastructure on AWS and Google Cloud, from VPC and IAM to
+I design, build and validate cloud infrastructure on AWS and Google Cloud, from VPC and IAM to
 delivery pipelines and GPU inference on Kubernetes, and I put a measured price on it.
 Every number on this page links to the evidence behind it.
 
@@ -10,7 +10,7 @@ Every number on this page links to the evidence behind it.
 
 ## How I work remotely
 
-- **Decisions in writing.** 25 architecture decision records in the operator, each stating its evidence; a STRIDE threat model whose counts CI checks.
+- **Decisions in writing.** 27 architecture decision records in the operator, each stating its evidence; a STRIDE threat model whose counts CI checks.
 - **Budget first, bill after.** Every paid GPU session has a cap approved before it starts and is reconciled against the real bill afterwards.
 - **Incidents reviewed in writing.** Three blameless [postmortems](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/postmortems/README.md) of real incidents (GPU stockouts in two regions, a billing line nobody estimated, a CI apply that failed halfway), each fix a merged PR; a [platform runbook](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/runbook.md) and a [production readiness review](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/prr.md) with what is still open.
 - **Reproducible by default.** Protocols are fixed before data is collected, results ship with the command that regenerates them, negative results are published.
@@ -23,9 +23,9 @@ Every number on this page links to the evidence behind it.
 |---|---|
 | [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: cut-over in 158 s with 83/83 health checks at 200, rollback in 174 s with 91/91. [Case study](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/case-study.md). |
 | [gke-llm-inference-platform](https://github.com/MicheleCampi/gke-llm-inference-platform) | Terraform and Argo CD on GKE: scale-to-zero L4 pool, keyless `terraform plan` on every PR, signed release tags. |
-| [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | The AWS twin on EKS, `terraform test` in CI with pinned tools. |
-| [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost; 104 unit tests and end-to-end jobs on kind. |
-| [inferscope](https://github.com/MicheleCampi/inferscope) | Rust profiler: per-token timing correlated with /proc and NVML; 319 tests. |
+| [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | The AWS twin on EKS, `terraform test` in CI with pinned tools. [Validated live](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/live-2026-11-15.md) on 15 November 2026: Karpenter scale-up and consolidation, Kyverno admission, alerting, clean teardown. |
+| [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost; unit tests and end-to-end jobs on kind in CI. |
+| [inferscope](https://github.com/MicheleCampi/inferscope) | Rust profiler: per-token timing correlated with /proc and NVML; validated on A10, A40 and H100. |
 | [llm-inference-platform](https://github.com/MicheleCampi/llm-inference-platform) | Entry point: how the pieces fit, threat model, status checked in CI. |
 
 ## Stack
