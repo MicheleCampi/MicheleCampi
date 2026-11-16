@@ -1,10 +1,14 @@
 # Michele Campi
 
-**Cloud Infrastructure Engineer · GPU & LLM inference · AWS, GCP, Kubernetes, Terraform**
+**Platform Engineer · Kubernetes & GPU inference · FinOps**
 
 I design, build and validate cloud infrastructure on AWS and Google Cloud, from VPC and IAM to
 delivery pipelines and GPU inference on Kubernetes, and I put a measured price on it.
 Every number on this page links to the evidence behind it.
+
+**How I deliver: AI-native, human in the loop.** An AI coding agent writes the code; I design,
+decide in written records, review and merge every pull request, approve every cost before it is
+spent, and run the live sessions.
 
 **Open to remote roles** · Italy (CET), async-first · Italian (native), English (professional) · [LinkedIn](https://www.linkedin.com/in/michele-campi)
 
@@ -21,7 +25,7 @@ Every number on this page links to the evidence behind it.
 
 | Repository | What it shows |
 |---|---|
-| [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: cut-over in 158 s with 83/83 health checks at 200, rollback in 174 s with 91/91. [Case study](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/case-study.md). |
+| [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: the same prod image, by digest, answered [60/60 health checks at 200 on EKS](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/evidence/A-016-eks-healthz.txt) (output published); cut-over in 158 s with 83/83 and rollback in 174 s with 91/91 (session notes, raw log not retained). [Case study](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/case-study.md). |
 | [gke-llm-inference-platform](https://github.com/MicheleCampi/gke-llm-inference-platform) | Terraform and Argo CD on GKE: scale-to-zero L4 pool, keyless `terraform plan` on every PR, signed release tags. |
 | [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | The AWS twin on EKS, `terraform test` in CI with pinned tools. [Validated live](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/live-2026-11-15.md) on 15 November 2026: Karpenter scale-up and consolidation, Kyverno admission, alerting, clean teardown. |
 | [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost; unit tests and end-to-end jobs on kind in CI. |
