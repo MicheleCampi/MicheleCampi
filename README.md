@@ -6,9 +6,9 @@ I design, build and validate cloud infrastructure on AWS and Google Cloud, from 
 delivery pipelines and GPU inference on Kubernetes, and I put a measured price on it.
 Every number on this page links to the evidence behind it.
 
-**How I deliver: AI-native, human in the loop.** An AI coding agent writes the code; I design,
-decide in written records, review and merge every pull request, approve every cost before it is
-spent, and run the live sessions. [How I work with AI](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/how-i-work-with-ai.md).
+**How I deliver: AI-native, human in the loop.** I work with an AI coding agent as the implementer
+and own everything around it: the design and acceptance criteria before any code, the CI gates it
+must pass, the review and merge of every pull request, the cost approval and the live proof. [How I work with AI](https://github.com/MicheleCampi/llm-inference-platform/blob/main/docs/how-i-work-with-ai.md).
 
 **Open to remote roles** · Italy (CET), async-first · Italian (native), English (professional) · [LinkedIn](https://www.linkedin.com/in/michele-campi)
 
@@ -25,10 +25,10 @@ spent, and run the live sessions. [How I work with AI](https://github.com/Michel
 
 | Repository | What it shows |
 |---|---|
+| [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | EKS with Terraform, Argo CD, Karpenter, Kyverno and External Secrets; `terraform test` in CI with pinned tools. A model served through the operator below; Karpenter under Spot interruption and drift. A [game day](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/gameday-2026-11-20.md) with three injected failures, all within SLO (1 failed request of 455). Its refuted hypothesis became a [blameless postmortem](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/gameday/postmortem-2026-11-20-s3.md), fixes in code, and a [live re-run](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/gameday-rerun-2026-11-21.md) that proved them. The operator was [measured against KServe](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/kind-serving-2026-11-19.md) with the same container. |
 | [aws-ecs-delivery-platform](https://github.com/MicheleCampi/aws-ecs-delivery-platform) | ECS Fargate behind an ALB with Cognito, DEV/QA/PROD image promotion, Terraform apply gated through GitHub OIDC. Measured: the same prod image, by digest, answered [60/60 health checks at 200 on EKS](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/evidence/A-016-eks-healthz.txt) (output published); cut-over in 158 s with 83/83 and rollback in 174 s with 91/91 (session notes, raw log not retained). [Case study](https://github.com/MicheleCampi/aws-ecs-delivery-platform/blob/main/docs/case-study.md). |
 | [gke-llm-inference-platform](https://github.com/MicheleCampi/gke-llm-inference-platform) | Terraform and Argo CD on GKE: scale-to-zero L4 pool, keyless `terraform plan` on every PR, signed release tags. |
-| [eks-llm-inference-platform](https://github.com/MicheleCampi/eks-llm-inference-platform) | The AWS twin on EKS, `terraform test` in CI with pinned tools. [Validated live](https://github.com/MicheleCampi/eks-llm-inference-platform/blob/main/docs/evidence/live-2026-11-15.md) on 15 November 2026: Karpenter scale-up and consolidation, Kyverno admission, alerting, clean teardown. |
-| [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost; unit tests and end-to-end jobs on kind in CI. |
+| [vllm-coldstart-operator](https://github.com/MicheleCampi/vllm-coldstart-operator) | Kubernetes operator in Rust: placement, preemption, per-team objectives and cost. Ready means warm: one real completion runs before Ready, so the first request on EKS dropped from 17–19 s to 5.8 s. Unit tests and end-to-end jobs on kind in CI. |
 | [inferscope](https://github.com/MicheleCampi/inferscope) | Rust profiler: per-token timing correlated with /proc and NVML; validated on A10, A40 and H100. |
 | [llm-inference-platform](https://github.com/MicheleCampi/llm-inference-platform) | Entry point: how the pieces fit, threat model, status checked in CI. |
 
@@ -36,9 +36,11 @@ spent, and run the live sessions. [How I work with AI](https://github.com/Michel
 
 - **AWS:** ECS Fargate, ALB, Cognito, ECR, IAM, CodeBuild/CodePipeline, CloudWatch, EKS
 - **Google Cloud:** GKE, Workload Identity, billing export
-- **Delivery:** Terraform, Argo CD, GitHub Actions with OIDC, signed releases
+- **Kubernetes platform:** EKS, GKE, Karpenter, Kyverno, External Secrets, Helm, KEDA
+- **Delivery:** Terraform with `terraform test`, Argo CD, GitHub Actions with OIDC, signed releases
+- **Reliability:** SLOs with burn-rate alerts, game days, blameless postmortems, runbooks
 - **Observability:** Prometheus, Grafana, multiwindow burn-rate alerts tested with promtool
-- **Languages:** Rust, Go ([llm-d router, merged](https://github.com/llm-d/llm-d-router/pull/2037)), Python, Bash
+- **Code I read, review and own (written with an AI agent):** Rust, Go, Python, HCL, Bash
 - **GPU inference:** vLLM, NVIDIA Dynamo, multi-tenant LoRA, eBPF, NVML
 
 ## Measurements behind the design decisions
